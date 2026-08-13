@@ -1,0 +1,12 @@
+{
+  "outputDirectory": "public",
+  "rewrites": [
+    { "source": "/((?!api/).*)", "destination": "/$1" }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron-expiry",
+      "schedule": "0 10 * * *"
+    }
+  ]
+}

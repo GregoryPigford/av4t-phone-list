@@ -1,0 +1,1470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AV4T Phone List — Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --cream: #faf7f2;
+      --warm-white: #fff9f2;
+      --brown: #5c3d2e;
+      --brown-light: #8b6355;
+      --gold: #c9973a;
+      --gold-light: #e8c07a;
+      --text: #2d1f17;
+      --text-muted: #7a5c50;
+      --border: #ddd0c4;
+      --success: #4a7c59;
+      --error: #8b3a3a;
+      --sidebar: 220px;
+    }
+
+    body {
+      background: var(--cream);
+      color: var(--text);
+      font-family: 'Source Sans 3', sans-serif;
+      font-weight: 300;
+      min-height: 100vh;
+    }
+
+    /* ── LOGIN ── */
+    #loginScreen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+
+    .login-card {
+      background: var(--warm-white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2.5rem;
+      width: 100%;
+      max-width: 360px;
+      text-align: center;
+      box-shadow: 0 2px 20px rgba(92,61,46,0.08);
+    }
+
+    .login-card h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      color: var(--brown);
+      margin-bottom: 0.4rem;
+    }
+
+    .login-card p { font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1.5rem; }
+
+    .login-card input {
+      width: 100%;
+      height: 44px;
+      padding: 0 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--cream);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .login-card input:focus { outline: none; border-color: var(--gold); box-shadow: 0 0 0 3px rgba(201,151,58,0.12); }
+
+    .btn-primary {
+      width: 100%;
+      height: 44px;
+      background: var(--brown);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-primary:hover { background: var(--brown-light); }
+
+    .login-error { color: var(--error); font-size: 0.85rem; margin-top: 0.75rem; display: none; }
+
+    /* ── APP SHELL ── */
+    #appShell { display: none; min-height: 100vh; }
+
+    .topbar {
+      background: var(--brown);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.5rem;
+      height: 56px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .topbar-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      letter-spacing: 0.02em;
+    }
+
+    .topbar-right {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .tab-btn {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #fff;
+      border-radius: 6px;
+      padding: 6px 14px;
+      font-family: inherit;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .tab-btn:hover { background: rgba(255,255,255,0.22); }
+    .tab-btn.active { background: var(--gold); border-color: var(--gold); color: #fff; }
+
+    .logout-btn {
+      background: none;
+      border: 1px solid rgba(255,255,255,0.3);
+      color: rgba(255,255,255,0.7);
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-family: inherit;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+    .logout-btn:hover { border-color: rgba(255,255,255,0.6); color: #fff; }
+
+    .main { padding: 1.5rem; max-width: 1100px; margin: 0 auto; }
+
+    /* ── STATS BAR ── */
+    .stats-bar {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .stat {
+      background: var(--warm-white);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.8rem 1.2rem;
+      flex: 1;
+      min-width: 140px;
+    }
+
+    .stat-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); }
+    .stat-value { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--brown); margin-top: 2px; }
+
+    /* ── TABLE ── */
+    .table-wrap {
+      background: var(--warm-white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .table-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .table-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.05rem;
+      color: var(--brown);
+    }
+
+    .print-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 14px;
+      font-family: inherit;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .print-btn:hover { border-color: var(--gold); color: var(--brown); }
+
+    table { width: 100%; border-collapse: collapse; }
+    thead { background: #f5ede4; }
+    th {
+      padding: 10px 14px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      text-align: left;
+    }
+
+    td {
+      padding: 11px 14px;
+      font-size: 0.9rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #fef9f2; }
+
+    .name-cell { font-weight: 500; color: var(--brown); }
+
+    .action-btns { display: flex; gap: 6px; }
+
+    .edit-btn, .del-btn {
+      border: none;
+      border-radius: 5px;
+      padding: 4px 10px;
+      font-family: inherit;
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    .edit-btn { background: #e8f0e8; color: #3a5c3a; }
+    .edit-btn:hover { opacity: 0.8; }
+    .del-btn { background: #f5e8e8; color: var(--error); }
+    .del-btn:hover { opacity: 0.8; }
+
+    .empty-row td {
+      text-align: center;
+      color: var(--text-muted);
+      padding: 2rem;
+      font-style: italic;
+    }
+
+    /* ── MODAL (Edit) ── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: var(--warm-white);
+      border-radius: 12px;
+      padding: 2rem;
+      width: 100%;
+      max-width: 480px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.2);
+    }
+
+    .modal h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      color: var(--brown);
+      margin-bottom: 1.2rem;
+    }
+
+    .modal .field { margin-bottom: 1rem; }
+    .modal label { display: block; font-size: 0.75rem; font-weight: 500; letter-spacing: 0.07em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 0.35rem; }
+    .modal input, .modal select {
+      width: 100%;
+      height: 40px;
+      padding: 0 12px;
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      background: var(--cream);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 0.95rem;
+    }
+    .modal input:focus, .modal select:focus { outline: none; border-color: var(--gold); }
+
+    .modal-actions { display: flex; gap: 10px; margin-top: 1.5rem; }
+    .modal-actions .btn-primary { flex: 1; }
+    .cancel-btn {
+      flex: 1;
+      height: 44px;
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      cursor: pointer;
+    }
+    .cancel-btn:hover { border-color: var(--brown-light); color: var(--brown); }
+
+    /* ── PRINT VIEW ── */
+    @media print {
+      * { visibility: hidden !important; margin: 0 !important; padding: 0 !important; }
+      #printArea, #printArea * { visibility: visible !important; }
+      #printArea {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+      }
+      html, body {
+        height: auto !important;
+        overflow: visible !important;
+        background: white !important;
+      }
+    }
+
+    .print-header { display: none; }
+
+    /* Sober time display */
+    .sober-time {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-card">
+    <h1>TUF Admin</h1>
+    <p>Phone List Administration</p>
+    <input type="password" id="passwordInput" placeholder="Password" onkeydown="if(event.key==='Enter')login()" />
+    <button class="btn-primary" onclick="login()">Sign In</button>
+    <p class="login-error" id="loginError">Incorrect password.</p>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="appShell">
+  <div class="topbar">
+    <span class="topbar-title">AV4T Phone List — Admin</span>
+    <div class="topbar-right">
+      <button class="tab-btn active" onclick="showTab('all')" id="tab-all">All Members</button>
+      <button class="tab-btn" onclick="showTab('male')" id="tab-male">Men</button>
+      <button class="tab-btn" onclick="showTab('female')" id="tab-female">Women</button>
+      <button class="tab-btn" onclick="showTab('nonbinary')" id="tab-nonbinary">Nonbinary</button>
+      <button class="logout-btn" onclick="logout()">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="main">
+
+    <!-- ANNOUNCEMENTS EDITOR -->
+    <div style="background:#fff9f2;border:1px solid #ddd0c4;border-radius:10px;padding:1.2rem 1.5rem;margin-bottom:1.25rem">
+      <div style="font-family:'Playfair Display',serif;font-size:1rem;color:#5c3d2e;font-weight:600;margin-bottom:.3rem">📢 Announcements</div>
+      <div style="font-size:.75rem;color:#9a8a7a;margin-bottom:1rem">Shown on the home screen. The business meeting notice is always pinned at the top automatically.</div>
+
+      <!-- Pinned business meeting (read-only display) -->
+      <div style="background:#f0f7f0;border:1px solid #b8d9b8;border-radius:7px;padding:.8rem 1rem;margin-bottom:1rem;font-size:.82rem;color:#2d5a2d">
+        📌 <strong>Pinned:</strong> Business meeting announcement (auto-generated, always shown)
+      </div>
+
+      <!-- Existing announcements list -->
+      <div id="adminAnnounceList" style="margin-bottom:1rem"></div>
+
+      <!-- Add new -->
+      <div style="display:flex;flex-direction:column;gap:6px;margin-top:.5rem">
+        <input type="text" id="announcementTitle" placeholder="Title (optional — shows in green like Business Meeting)" style="padding:8px 11px;border:1px solid #ddd0c4;border-radius:6px;font-family:inherit;font-size:.85rem;background:#faf7f2"/>
+        <div style="display:flex;gap:8px;align-items:flex-start">
+          <textarea id="announcementText" placeholder="Announcement body text..." style="flex:1;height:72px;padding:9px 12px;border:1px solid #ddd0c4;border-radius:6px;font-family:inherit;font-size:.88rem;resize:vertical;background:#faf7f2"></textarea>
+          <button onclick="addAnnouncement()" style="background:#5c3d2e;color:#fff;border:none;border-radius:6px;padding:9px 16px;font-family:inherit;font-size:.85rem;cursor:pointer;white-space:nowrap;height:72px">Add</button>
+        </div>
+      </div>
+      <div id="announceMsg" style="font-size:.82rem;margin-top:.5rem;display:none"></div>
+    </div>
+
+
+
+    <!-- RESOURCES EDITOR -->
+    <div style="background:#fff9f2;border:1px solid #ddd0c4;border-radius:10px;padding:1.2rem 1.5rem;margin-bottom:1.25rem">
+      <div style="font-family:'Playfair Display',serif;font-size:1rem;color:#5c3d2e;font-weight:600;margin-bottom:.3rem">🔗 Resources</div>
+      <div style="font-size:.75rem;color:#9a8a7a;margin-bottom:1rem">Manage which resources appear on the site and in what order. Toggle visibility without deleting.</div>
+
+      <div id="adminResourcesList" style="margin-bottom:1rem"></div>
+
+      <div style="background:#f5f0ea;border-radius:8px;padding:1rem;margin-top:.5rem">
+        <div style="font-size:.75rem;font-weight:600;color:#5c3d2e;margin-bottom:.6rem;text-transform:uppercase;letter-spacing:.06em">Add New Resource</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <input type="text" id="resTitle" placeholder="Title" style="padding:7px 10px;border:1px solid #ddd0c4;border-radius:6px;font-family:inherit;font-size:.85rem;background:#faf7f2"/>
+          <input type="text" id="resDesc" placeholder="Description (optional)" style="padding:7px 10px;border:1px solid #ddd0c4;border-radius:6px;font-family:inherit;font-size:.85rem;background:#faf7f2"/>
+          <input type="text" id="resUrl" placeholder="URL (e.g. https://... or mailto:... or 'venmo')" style="padding:7px 10px;border:1px solid #ddd0c4;border-radius:6px;font-family:inherit;font-size:.85rem;background:#faf7f2"/>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <input type="text" id="resIcon" placeholder="Icon emoji e.g. 🔗" style="width:80px;padding:7px 10px;border:1px solid #ddd0c4;border-radius:6px;font-family:inherit;font-size:.85rem;background:#faf7f2"/>
+            <input type="color" id="resColor" value="#1a4a7a" style="width:48px;height:34px;border:1px solid #ddd0c4;border-radius:6px;cursor:pointer;padding:2px"/>
+            <input type="number" id="resOrder" value="0" min="0" placeholder="Order" style="width:70px;padding:7px 10px;border:1px solid #ddd0c4;border-radius:6px;font-family:inherit;font-size:.85rem;background:#faf7f2"/>
+            <button onclick="addResource()" style="background:#5c3d2e;color:#fff;border:none;border-radius:6px;padding:7px 16px;font-family:inherit;font-size:.83rem;cursor:pointer">Add</button>
+          </div>
+        </div>
+        <div id="resMsg" style="font-size:.78rem;margin-top:.5rem;display:none"></div>
+      </div>
+    </div>
+
+    <!-- FEATURE CARDS EDITOR -->
+    <div style="background:#fff9f2;border:1px solid #ddd0c4;border-radius:10px;padding:1.2rem 1.5rem;margin-bottom:1.25rem">
+      <div style="font-family:'Playfair Display',serif;font-size:1rem;color:#5c3d2e;font-weight:600;margin-bottom:.3rem">🖼️ Home Feature Cards</div>
+      <div style="font-size:.75rem;color:#9a8a7a;margin-bottom:1rem">Cards shown below the hero on the home screen (e.g. memorials, announcements). Drag to reorder coming soon.</div>
+
+      <div id="adminFeatureCardsList" style="margin-bottom:1rem"></div>
+
+      <!-- Add new card -->
+      <div style="background:#f5f0ea;border:1px solid #ddd0c4;border-radius:8px;padding:1rem;margin-top:.5rem">
+        <div style="font-size:.75rem;font-weight:600;color:#5c3d2e;margin-bottom:.6rem;text-transform:uppercase;letter-spacing:.06em">Add New Card</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <input type="text" id="fcTitle" placeholder="Title (e.g. Rest in Peace, Gerry C.)" style="padding:8px 11px;border:1px solid #ddd0c4;border-radius:6px;font-family:inherit;font-size:.88rem;background:#faf7f2"/>
+          <textarea id="fcBody" placeholder="Body text (optional)" style="height:60px;padding:8px 11px;border:1px solid #ddd0c4;border-radius:6px;font-family:inherit;font-size:.88rem;resize:vertical;background:#faf7f2"></textarea>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <div style="flex:1;min-width:140px">
+              <label style="font-size:.72rem;color:#7a5c50;display:block;margin-bottom:3px">Title Font</label>
+              <select id="fcFont" style="width:100%;padding:7px 10px;border:1px solid #ddd0c4;border-radius:6px;font-family:inherit;font-size:.85rem;background:#faf7f2">
+                <option value="cursive">Cursive (Dancing Script)</option>
+                <option value="serif">Serif (Fraunces)</option>
+                <option value="sans">Sans-serif (DM Sans)</option>
+              </select>
+            </div>
+            <div style="flex:1;min-width:140px">
+              <label style="font-size:.72rem;color:#7a5c50;display:block;margin-bottom:3px">Photo (optional)</label>
+              <input type="file" id="fcPhoto" accept="image/jpeg,image/png,image/webp,image/gif" style="width:100%;padding:4px;font-size:.82rem;font-family:inherit"/>
+              <div style="font-size:.7rem;color:#9a8a7a;margin-top:3px">Accepted: JPG, PNG, WebP, GIF · Max 5MB<br>⚠️ iPhone HEIC photos must be converted to JPG first</div>
+              <div id="fcPhotoPreview" style="margin-top:5px;display:none">
+                <img id="fcPhotoImg" style="width:56px;height:56px;border-radius:50%;object-fit:cover;border:2px solid #ddd0c4"/>
+                <button onclick="clearPhoto()" style="background:none;border:none;color:#8b3a3a;font-size:.75rem;cursor:pointer;margin-left:6px">✕ Remove</button>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <div style="flex:1;min-width:80px">
+              <label style="font-size:.72rem;color:#7a5c50;display:block;margin-bottom:3px">Order (lower = first)</label>
+              <input type="number" id="fcOrder" value="0" min="0" style="width:80px;padding:7px 10px;border:1px solid #ddd0c4;border-radius:6px;font-family:inherit;font-size:.85rem;background:#faf7f2"/>
+            </div>
+            <button onclick="addFeatureCard()" style="background:#5c3d2e;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-family:inherit;font-size:.85rem;cursor:pointer;margin-top:14px">Add Card</button>
+          </div>
+        </div>
+        <div id="fcMsg" style="font-size:.82rem;margin-top:.5rem;display:none"></div>
+      </div>
+    </div>
+
+
+
+
+    <!-- BROADCAST EMAIL -->
+    <div style="background:#fff9f2;border:1px solid #ddd0c4;border-radius:10px;padding:1.2rem 1.5rem;margin-bottom:1.25rem">
+      <div style="font-family:'Playfair Display',serif;font-size:1rem;color:#5c3d2e;font-weight:600;margin-bottom:.3rem">📣 Send Email to Members</div>
+      <div style="font-size:.75rem;color:#9a8a7a;margin-bottom:.75rem">Only sends to members who have an email address on file.</div>
+
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <div style="flex:1;min-width:120px">
+            <label style="font-size:.7rem;font-weight:600;color:#7a5c50;display:block;margin-bottom:3px;text-transform:uppercase;letter-spacing:.06em">Send To</label>
+            <select id="broadcastList" style="width:100%;padding:7px 10px;border:1px solid #ddd0c4;border-radius:6px;font-family:inherit;font-size:.85rem;background:#faf7f2;appearance:none">
+              <option value="all">All Members</option>
+              <option value="male">Men's List Only</option>
+              <option value="female">Women's List Only</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label style="font-size:.7rem;font-weight:600;color:#7a5c50;display:block;margin-bottom:3px;text-transform:uppercase;letter-spacing:.06em">Subject *</label>
+          <input type="text" id="broadcastSubject" placeholder="e.g. TUF Meeting Update" style="width:100%;padding:7px 10px;border:1px solid #ddd0c4;border-radius:6px;font-family:inherit;font-size:.85rem;background:#faf7f2"/>
+        </div>
+        <div>
+          <label style="font-size:.7rem;font-weight:600;color:#7a5c50;display:block;margin-bottom:3px;text-transform:uppercase;letter-spacing:.06em">Message *</label>
+          <textarea id="broadcastBody" placeholder="Write your message here..." rows="5" style="width:100%;padding:7px 10px;border:1px solid #ddd0c4;border-radius:6px;font-family:inherit;font-size:.85rem;background:#faf7f2;resize:vertical"></textarea>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button onclick="previewBroadcast()" style="background:none;border:1px solid #5c3d2e;color:#5c3d2e;border-radius:6px;padding:9px 18px;font-family:inherit;font-size:.85rem;cursor:pointer">Preview</button>
+          <button onclick="sendBroadcast()" style="background:#5c3d2e;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-family:inherit;font-size:.85rem;cursor:pointer">Send Email</button>
+        </div>
+        <div id="broadcastMsg" style="font-size:.8rem;display:none"></div>
+      </div>
+    </div>
+
+    <!-- BROADCAST PREVIEW MODAL -->
+    <div id="broadcastPreviewModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;align-items:center;justify-content:center;padding:1rem">
+      <div style="background:#fff9f2;border-radius:12px;padding:1.5rem;max-width:560px;width:100%;max-height:80vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+        <div style="font-family:'Playfair Display',serif;font-size:1.1rem;color:#5c3d2e;margin-bottom:1rem;font-weight:600">Email Preview</div>
+        <div style="background:#f2f0eb;border-radius:8px;padding:.75rem 1rem;margin-bottom:.75rem;font-size:.8rem;color:#5c3d2e">
+          <strong>To:</strong> <span id="previewTo"></span><br>
+          <strong>Subject:</strong> <span id="previewSubject"></span>
+        </div>
+        <div id="previewBody" style="font-size:.88rem;line-height:1.7;color:#2d1f17;white-space:pre-wrap;border:1px solid #ddd0c4;border-radius:8px;padding:1rem;background:white"></div>
+        <div style="display:flex;gap:8px;margin-top:1rem;justify-content:flex-end">
+          <button onclick="document.getElementById('broadcastPreviewModal').style.display='none'" style="background:none;border:1px solid #ddd0c4;border-radius:6px;padding:8px 18px;font-family:inherit;font-size:.85rem;cursor:pointer">Close</button>
+          <button onclick="document.getElementById('broadcastPreviewModal').style.display='none';sendBroadcast()" style="background:#5c3d2e;color:#fff;border:none;border-radius:6px;padding:8px 18px;font-family:inherit;font-size:.85rem;cursor:pointer">Send Now</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXPIRY SETTINGS -->
+    <div style="background:#fff9f2;border:1px solid #ddd0c4;border-radius:10px;padding:1.2rem 1.5rem;margin-bottom:1.25rem">
+      <div style="font-family:'Playfair Display',serif;font-size:1rem;color:#5c3d2e;font-weight:600;margin-bottom:.3rem">⚙️ Expiry Settings</div>
+      <div style="font-size:.75rem;color:#9a8a7a;margin-bottom:.75rem">Members are automatically removed after this many days of inactivity. Warning emails are sent 30 days before expiry.</div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <div>
+          <label style="font-size:.7rem;font-weight:600;color:#7a5c50;display:block;margin-bottom:3px;text-transform:uppercase;letter-spacing:.06em">Days until expiry</label>
+          <input type="number" id="expiryDaysInput" min="30" max="730" value="180" style="width:100px;padding:7px 10px;border:1px solid #ddd0c4;border-radius:6px;font-family:inherit;font-size:.95rem;background:#faf7f2;font-weight:700"/>
+        </div>
+        <button onclick="saveExpirySetting()" style="background:#5c3d2e;color:#fff;border:none;border-radius:6px;padding:9px 18px;font-family:inherit;font-size:.85rem;cursor:pointer;margin-top:14px">Save</button>
+        <div id="expirySettingMsg" style="font-size:.8rem;display:none;margin-top:14px"></div>
+      </div>
+      <div style="font-size:.73rem;color:#9a8a7a;margin-top:.6rem" id="expirySettingNote"></div>
+    </div>
+
+    <!-- EXPIRY SECTION -->
+    <div style="background:#fff9f2;border:1px solid #ddd0c4;border-radius:10px;padding:1.2rem 1.5rem;margin-bottom:1.25rem">
+      <div style="font-family:'Playfair Display',serif;font-size:1rem;color:#5c3d2e;font-weight:600;margin-bottom:.3rem">⏰ Listing Expiry</div>
+      <div style="font-size:.75rem;color:#9a8a7a;margin-bottom:1rem">Members expire 180 days after joining or last renewal. Warning emails sent at 150 days.</div>
+
+      <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1rem">
+        <div id="expiryStats" style="flex:1;min-width:200px;background:#f5f0ea;border-radius:8px;padding:.75rem 1rem;font-size:.82rem;color:#5c3d2e">Loading...</div>
+        <button onclick="runExpiryCheck()" style="height:40px;padding:0 16px;background:#5c3d2e;color:white;border:none;border-radius:6px;font-family:inherit;font-size:.82rem;cursor:pointer;white-space:nowrap">Run Check Now</button>
+      </div>
+
+      <div id="expiryWarnList" style="margin-bottom:.75rem"></div>
+      <div id="expiryExpiredList"></div>
+    </div>
+
+
+    <!-- ADD MEMBER -->
+    <div style="background:#fff9f2;border:1px solid #ddd0c4;border-radius:10px;padding:1.2rem 1.5rem;margin-bottom:1.25rem">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.3rem">
+        <div style="font-family:'Playfair Display',serif;font-size:1rem;color:#5c3d2e;font-weight:600">➕ Add Member Manually</div>
+        <button onclick="toggleAddMember()" id="toggleAddBtn" style="background:none;border:1px solid #ddd0c4;border-radius:6px;padding:4px 12px;font-family:inherit;font-size:.78rem;color:#7a5c50;cursor:pointer">Show</button>
+      </div>
+      <div style="font-size:.75rem;color:#9a8a7a;margin-bottom:.75rem">Member will have no PIN — they'll be prompted to create one when they first update their info.</div>
+
+      <div id="addMemberForm" style="display:none">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+          <div>
+            <label style="font-size:.7rem;font-weight:600;color:#7a5c50;display:block;margin-bottom:3px;text-transform:uppercase;letter-spacing:.06em">Name *</label>
+            <input type="text" id="am-name" placeholder="e.g. Diana A." style="width:100%;padding:7px 10px;border:1px solid #ddd0c4;border-radius:6px;font-family:inherit;font-size:.85rem;background:#faf7f2"/>
+          </div>
+          <div>
+            <label style="font-size:.7rem;font-weight:600;color:#7a5c50;display:block;margin-bottom:3px;text-transform:uppercase;letter-spacing:.06em">Phone *</label>
+            <input type="tel" id="am-phone" placeholder="(503) 555-1234" style="width:100%;padding:7px 10px;border:1px solid #ddd0c4;border-radius:6px;font-family:inherit;font-size:.85rem;background:#faf7f2"/>
+          </div>
+          <div>
+            <label style="font-size:.7rem;font-weight:600;color:#7a5c50;display:block;margin-bottom:3px;text-transform:uppercase;letter-spacing:.06em">Email</label>
+            <input type="email" id="am-email" placeholder="optional" style="width:100%;padding:7px 10px;border:1px solid #ddd0c4;border-radius:6px;font-family:inherit;font-size:.85rem;background:#faf7f2"/>
+          </div>
+          <div>
+            <label style="font-size:.7rem;font-weight:600;color:#7a5c50;display:block;margin-bottom:3px;text-transform:uppercase;letter-spacing:.06em">Sobriety Date</label>
+            <input type="date" id="am-sobriety" style="width:100%;padding:7px 10px;border:1px solid #ddd0c4;border-radius:6px;font-family:inherit;font-size:.85rem;background:#faf7f2"/>
+          </div>
+          <div>
+            <label style="font-size:.7rem;font-weight:600;color:#7a5c50;display:block;margin-bottom:3px;text-transform:uppercase;letter-spacing:.06em">List *</label>
+            <select id="am-gender" style="width:100%;padding:7px 10px;border:1px solid #ddd0c4;border-radius:6px;font-family:inherit;font-size:.85rem;background:#faf7f2;appearance:none">
+              <option value="">Select...</option>
+              <option value="male">Men's List</option>
+              <option value="female">Women's List</option>
+              <option value="nonbinary">Both Lists (Nonbinary)</option>
+            </select>
+          </div>
+          <div>
+            <label style="font-size:.7rem;font-weight:600;color:#7a5c50;display:block;margin-bottom:3px;text-transform:uppercase;letter-spacing:.06em">Willing to Sponsor</label>
+            <select id="am-sponsor" style="width:100%;padding:7px 10px;border:1px solid #ddd0c4;border-radius:6px;font-family:inherit;font-size:.85rem;background:#faf7f2;appearance:none">
+              <option value="">Select...</option>
+              <option>Yes</option>
+              <option>Ask me</option>
+              <option>No</option>
+              <option>Not yet</option>
+              <option>Sober support</option>
+              <option>Temporarily</option>
+            </select>
+          </div>
+        </div>
+        <button onclick="adminAddMember()" style="background:#5c3d2e;color:#fff;border:none;border-radius:6px;padding:9px 20px;font-family:inherit;font-size:.85rem;cursor:pointer">Add Member</button>
+        <div id="amMsg" style="font-size:.8rem;margin-top:.5rem;display:none"></div>
+      </div>
+    </div>
+
+    <div class="stats-bar" id="statsBar">
+      <div class="stat"><div class="stat-label">Total Members</div><div class="stat-value" id="statTotal">—</div></div>
+      <div class="stat"><div class="stat-label">Men</div><div class="stat-value" id="statMen">—</div></div>
+      <div class="stat"><div class="stat-label">Women</div><div class="stat-value" id="statWomen">—</div></div>
+      <div class="stat"><div class="stat-label">Nonbinary</div><div class="stat-value" id="statNonbinary">—</div></div>
+      <div class="stat"><div class="stat-label">Combined Sober Time</div><div class="stat-value sober-time" id="statSober">—</div></div>
+    </div>
+
+    <div class="table-wrap">
+      <div class="table-header">
+        <span class="table-title" id="tableTitle">All Members</span>
+        <button class="print-btn" onclick="exportCSV()" style="margin-right:8px">⬇ Export CSV</button><button class="print-btn" onclick="printList()">⎙ Print List</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th style="white-space:nowrap">Phone</th>
+            <th>Email</th>
+            <th>Sobriety Date</th>
+            <th>Willing to Sponsor</th>
+            <th>List</th>
+            <th>Expires</th>
+            <th>PIN</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="membersTbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <h2>Edit Member</h2>
+    <input type="hidden" id="editId" />
+    <div class="field"><label>Name</label><input type="text" id="editName" /></div>
+    <div class="field"><label>Phone</label><input type="tel" id="editPhone" /></div>
+    <div class="field"><label>Email</label><input type="email" id="editEmail" /></div>
+    <div class="field"><label>Sobriety Date</label><input type="date" id="editSobriety" /></div>
+    <div class="field">
+      <label>Willing to Sponsor</label>
+      <select id="editSponsorDrop">
+        <option value="">Select...</option>
+        <option value="Yes">Yes</option>
+        <option value="Ask me">Ask me</option>
+        <option value="No">No</option>
+        <option value="Not yet">Not yet</option>
+        <option value="Sober support">Sober support only</option>
+        <option value="Temporarily">Temporarily</option>
+        <option value="Other">Other (specify below)</option>
+      </select>
+    </div>
+    <div class="field"><label>Sponsor note</label><input type="text" id="editSponsorOther" placeholder="e.g. locally only" /></div>
+    <div class="field">
+      <label>List</label>
+      <select id="editGender">
+        <option value="male">Men's</option>
+        <option value="female">Women's</option>
+        <option value="nonbinary">Nonbinary</option>
+      </select>
+    </div>
+    <div class="modal-actions">
+      <button class="cancel-btn" onclick="closeModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveEdit()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<script>
+
+  let token = '';
+  let allMembers = [];
+  let currentTab = 'all';
+
+  function login() {
+    const pw = document.getElementById('passwordInput').value;
+    document.getElementById('loginError').style.display = 'none';
+    fetch('/api/members?admin=1', { headers: { Authorization: `Bearer ${pw}` } })
+      .then(r => { if (!r.ok) throw new Error(); return r.json(); })
+      .then(data => {
+        token = pw;
+        allMembers = data;
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('appShell').style.display = 'block';
+        renderStats();
+        renderTable();
+        loadAnnouncementAdmin();
+        loadFeatureCardsAdmin();
+        loadExpiryData();
+        loadExpirySetting();
+        loadResourcesAdmin();
+      })
+      .catch(() => { document.getElementById('loginError').style.display = 'block'; });
+  }
+
+  function logout() {
+    token = '';
+    allMembers = [];
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('appShell').style.display = 'none';
+    document.getElementById('passwordInput').value = '';
+  }
+
+  function showTab(tab) {
+    currentTab = tab;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(`tab-${tab}`).classList.add('active');
+    const titles = { all: 'All Members', male: "Men's List", female: "Women's List", nonbinary: 'Nonbinary List' };
+    document.getElementById('tableTitle').textContent = titles[tab];
+    renderTable();
+  }
+
+  async function reloadMembers() {
+    try {
+      const r = await fetch('/api/members?admin=1', { headers: { Authorization: `Bearer ${token}` } });
+      if (!r.ok) return;
+      allMembers = await r.json();
+      renderStats();
+      renderTable();
+    } catch(e) {}
+  }
+
+  function isNew(m) {
+    if (!m.created_at) return false;
+    return (Date.now() - new Date(m.created_at)) < 7 * 24 * 60 * 60 * 1000;
+  }
+
+  function fmtExpiry(last_renewed) {
+    if (!last_renewed) return '<span style="color:#92400e">Unknown</span>';
+    const renewed = new Date(last_renewed);
+    const expiry = new Date(renewed.getTime() + 180 * 24 * 60 * 60 * 1000);
+    const now = new Date();
+    const daysLeft = Math.floor((expiry - now) / (1000 * 60 * 60 * 24));
+    const dateStr = expiry.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' });
+    if (daysLeft < 0) return `<span style="color:#8b3a3a;font-weight:600">Expired</span>`;
+    if (daysLeft <= 30) return `<span style="color:#92400e;font-weight:600">${dateStr}</span>`;
+    if (daysLeft <= 60) return `<span style="color:#c96a20">${dateStr}</span>`;
+    return `<span style="color:#475569">${dateStr}</span>`;
+  }
+
+  function fmtPhone(raw) {
+    if (!raw) return '—';
+    const t = raw.trim();
+    if (t.startsWith('+') || t.toLowerCase().includes('whatsapp')) return t;
+    const d = t.replace(/\D/g, '');
+    if (d.length === 10) return `${d.slice(0,3)}-${d.slice(3,6)}-${d.slice(6)}`;
+    if (d.length === 11 && d[0] === '1') return `${d.slice(1,4)}-${d.slice(4,7)}-${d.slice(7)}`;
+    return t;
+  }
+
+  function formatDate(d) {
+    const [y, m, day] = d.split('-');
+    return `${parseInt(m)}/${parseInt(day)}/${y.slice(2)}`;
+  }
+
+  function soberYearsDays(members) {
+    let totalDays = 0;
+    const today = new Date();
+    members.forEach(m => {
+      if (m.sobriety_date) {
+        const d = new Date(m.sobriety_date);
+        const diff = Math.floor((today - d) / (1000 * 60 * 60 * 24));
+        if (diff > 0) totalDays += diff;
+      }
+    });
+    const years = Math.floor(totalDays / 365);
+    const days = totalDays % 365;
+    return `${years}y ${days}d`;
+  }
+
+  function sponsorDisplay(m) {
+    const d = m.sponsor_dropdown || '';
+    const o = m.sponsor_other || '';
+    if (d === 'Other' && o) return o;
+    if (d && o) return `${d}, ${o}`;
+    return d || '—';
+  }
+
+  function filteredMembers() {
+    if (currentTab === 'all') return allMembers;
+    return allMembers.filter(m => m.gender === currentTab);
+  }
+
+  function renderStats() {
+    const all = allMembers;
+    document.getElementById('statTotal').textContent = all.length;
+    document.getElementById('statMen').textContent = all.filter(m => m.gender === 'male').length;
+    document.getElementById('statWomen').textContent = all.filter(m => m.gender === 'female').length;
+    document.getElementById('statNonbinary').textContent = all.filter(m => m.gender === 'nonbinary').length;
+    document.getElementById('statSober').textContent = soberYearsDays(all);
+  }
+
+  function renderTable() {
+    const tbody = document.getElementById('membersTbody');
+    const members = filteredMembers();
+    if (!members.length) {
+      tbody.innerHTML = '<tr class="empty-row"><td colspan="8">No members in this list yet.</td></tr>';
+      return;
+    }
+    const genderLabel = { male: "Men's", female: "Women's", nonbinary: 'Nonbinary' };
+    const sorted = [...members].sort((a, b) => {
+      const an = isNew(a), bn = isNew(b);
+      if (an && !bn) return -1;
+      if (!an && bn) return 1;
+      return a.name.localeCompare(b.name);
+    });
+    tbody.innerHTML = sorted.map(m => `
+      <tr style="${isNew(m) ? 'background:#f0fdf4;border-left:3px solid #22c55e' : ''}">
+        <td class="name-cell">${esc(m.name)}${isNew(m) ? '<span style="background:#22c55e;color:white;font-size:.6rem;font-weight:700;padding:1px 6px;border-radius:999px;margin-left:6px;vertical-align:middle">NEW</span>' : ''}</td>
+        <td style="${m.phone && m.phone.replace(/\D/g,'').length <= 11 ? 'white-space:nowrap' : ''}">${fmtPhone(m.phone)}</td>
+        <td>${m.email ? esc(m.email) : '—'}</td>
+        <td>${m.sobriety_date ? formatDate(m.sobriety_date) : '—'}</td>
+        <td>${esc(sponsorDisplay(m))}</td>
+        <td>${genderLabel[m.gender] || m.gender}</td>
+        <td style="white-space:nowrap;font-size:.8rem">${fmtExpiry(m.last_renewed)}</td>
+        <td style="text-align:center">${m.pin_hash ? '<span style="color:#14532d;font-weight:600">✅</span>' : '<span style="color:#92400e;font-weight:600">⚠️</span>'}</td>
+        <td>
+          <div class="action-btns">
+            <button class="edit-btn" onclick="openEdit('${m.id}')">Edit</button>
+            <button class="del-btn" onclick="deleteMember('${m.id}', '${esc(m.name)}')">Remove</button>
+            <button onclick="resetPin('${m.id}','${esc(m.name)}')" style="background:none;border:1px solid #c8b8d8;border-radius:5px;padding:4px 10px;font-size:.78rem;color:#4a2d5a;cursor:pointer;font-family:inherit">Reset PIN</button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function esc(str) {
+    if (!str) return '';
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  }
+
+  function openEdit(id) {
+    const m = allMembers.find(x => x.id === id);
+    if (!m) return;
+    document.getElementById('editId').value = id;
+    document.getElementById('editName').value = m.name || '';
+    document.getElementById('editPhone').value = m.phone || '';
+    document.getElementById('editEmail').value = m.email || '';
+    document.getElementById('editSobriety').value = m.sobriety_date || '';
+    document.getElementById('editSponsorDrop').value = m.sponsor_dropdown || '';
+    document.getElementById('editSponsorOther').value = m.sponsor_other || '';
+    document.getElementById('editGender').value = m.gender || 'male';
+    document.getElementById('editModal').style.display = 'flex';
+  }
+
+  function closeModal() {
+    document.getElementById('editModal').style.display = 'none';
+  }
+
+  async function saveEdit() {
+    const id = document.getElementById('editId').value;
+    const body = {
+      name: document.getElementById('editName').value.trim(),
+      phone: document.getElementById('editPhone').value.trim(),
+      email: document.getElementById('editEmail').value.trim() || null,
+      sobriety_date: document.getElementById('editSobriety').value || null,
+      sponsor_dropdown: document.getElementById('editSponsorDrop').value || null,
+      sponsor_other: document.getElementById('editSponsorOther').value.trim() || null,
+      gender: document.getElementById('editGender').value,
+    };
+    try {
+      const res = await fetch('/api/member?id=' + id, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(body)
+      });
+      if (!res.ok) throw new Error('Save failed');
+      closeModal();
+      await reloadMembers();
+    } catch(e) { alert('Save failed. Please try again.'); }
+  }
+
+  async function deleteMember(id, name) {
+    if (!confirm(`Remove ${name} from the list?`)) return;
+    try {
+      const res = await fetch('/api/member?id=' + id, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (!res.ok) throw new Error('Delete failed');
+      await reloadMembers();
+    } catch(e) { alert('Remove failed. Please try again.'); }
+  }
+
+  async function resetPin(id, name) {
+    if (!confirm(`Reset PIN for ${name}?\n\nThis clears their PIN. They will be asked to verify their phone number and create a new PIN next time they update their info.`)) return;
+    try {
+      const res = await fetch('/api/member?id=' + id, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ _resetPin: true })
+      });
+      if (!res.ok) throw new Error('Failed');
+      alert(`PIN reset for ${name}. They will set a new one next time they update their info.`);
+      await reloadMembers();
+    } catch(e) { alert('Reset failed.'); }
+  }
+
+  function printList() {
+    const members = filteredMembers().sort((a,b) => a.name.localeCompare(b.name));
+    const title = currentTab === 'all' ? 'All Members' : currentTab === 'male' ? "Men's List" : currentTab === 'female' ? "Women's List" : 'Nonbinary List';
+    const date = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+
+    // Build print area
+    let existing = document.getElementById('printArea');
+    if (existing) existing.remove();
+
+    const div = document.createElement('div');
+    div.id = 'printArea';
+    div.style.cssText = 'font-family:Georgia,serif;padding:1in;display:none';
+    div.innerHTML = `
+      <div style="text-align:center;margin-bottom:24px;border-bottom:2px solid #1a2d4a;padding-bottom:16px">
+        <div style="font-size:18pt;font-weight:700;color:#1a2d4a">A Vision For Today</div>
+        <div style="font-size:11pt;color:#666;margin-top:4px">${title} · ${date}</div>
+        <div style="font-size:10pt;color:#666">${members.length} member${members.length===1?'':'s'}</div>
+      </div>
+      <table style="width:100%;border-collapse:collapse;font-size:10pt">
+        <thead>
+          <tr style="border-bottom:1px solid #1a2d4a">
+            <th style="text-align:left;padding:4px 8px;color:#1a2d4a;font-size:8pt;text-transform:uppercase;letter-spacing:.08em">Name</th>
+            <th style="text-align:left;padding:4px 8px;color:#1a2d4a;font-size:8pt;text-transform:uppercase;letter-spacing:.08em">Phone</th>
+            <th style="text-align:left;padding:4px 8px;color:#1a2d4a;font-size:8pt;text-transform:uppercase;letter-spacing:.08em">Sober Since</th>
+            <th style="text-align:left;padding:4px 8px;color:#1a2d4a;font-size:8pt;text-transform:uppercase;letter-spacing:.08em">Sponsor?</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${members.map((m,i) => `
+            <tr style="border-bottom:1px solid #eee;background:${i%2===0?'white':'#f9f7f4'}">
+              <td style="padding:5px 8px;font-weight:600">${esc(m.name)}</td>
+              <td style="padding:5px 8px;font-family:'Courier New',monospace">${fmtPhone(m.phone)}</td>
+              <td style="padding:5px 8px">${m.sobriety_date ? formatDate(m.sobriety_date) : '—'}</td>
+              <td style="padding:5px 8px">${esc(sponsorDisplay(m))}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+      <div style="margin-top:20px;text-align:center;font-size:8pt;color:#999;border-top:1px solid #eee;padding-top:8px">
+        Printed from av4t.com · Confidential — for members only
+      </div>
+    `;
+    document.body.appendChild(div);
+    div.style.display = 'block';
+    window.print();
+    setTimeout(() => div.remove(), 1000);
+  }
+
+  function toggleAddMember() {
+    const form = document.getElementById('addMemberForm');
+    const btn = document.getElementById('toggleAddBtn');
+    const showing = form.style.display !== 'none';
+    form.style.display = showing ? 'none' : 'block';
+    btn.textContent = showing ? 'Show' : 'Hide';
+  }
+
+  async function adminAddMember() {
+    const name = document.getElementById('am-name').value.trim();
+    const phone = document.getElementById('am-phone').value.trim();
+    const email = document.getElementById('am-email').value.trim();
+    const sobriety_date = document.getElementById('am-sobriety').value;
+    const gender = document.getElementById('am-gender').value;
+    const sponsor_dropdown = document.getElementById('am-sponsor').value;
+    const msg = document.getElementById('amMsg');
+    if (!name) { msg.textContent='Name is required.'; msg.style.color='#8b3a3a'; msg.style.display='block'; return; }
+    if (!phone) { msg.textContent='Phone is required.'; msg.style.color='#8b3a3a'; msg.style.display='block'; return; }
+    if (!gender) { msg.textContent='Please select a list.'; msg.style.color='#8b3a3a'; msg.style.display='block'; return; }
+    try {
+      const res = await fetch('/api/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ name, phone, email: email||null, sobriety_date: sobriety_date||null, gender, sponsor_dropdown: sponsor_dropdown||null, sponsor_other: null, pin: '0000', _adminAdd: true })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed');
+      msg.textContent = `✅ ${name} added! They have no PIN yet.`;
+      msg.style.color = '#14532d';
+      msg.style.display = 'block';
+      ['am-name','am-phone','am-email','am-sobriety'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('am-gender').value = '';
+      document.getElementById('am-sponsor').value = '';
+      await reloadMembers();
+    } catch(e) {
+      msg.textContent = e.message || 'Failed to add member.';
+      msg.style.color = '#8b3a3a';
+      msg.style.display = 'block';
+    }
+  }
+
+  // ── ANNOUNCEMENTS ──
+  async function loadAnnouncementAdmin() {
+    try {
+      const res = await fetch('/api/announcement', { headers: { 'Authorization': `Bearer ${token}` } });
+      const data = await res.json();
+      renderAdminAnnouncements(data.announcements || []);
+    } catch(e) {}
+  }
+
+  function renderAdminAnnouncements(anns) {
+    const el = document.getElementById('adminAnnList');
+    if (!el) return;
+    if (!anns.length) { el.innerHTML = '<p style="font-size:.82rem;color:#9a8a7a;font-style:italic">No announcements.</p>'; return; }
+    el.innerHTML = anns.map(a => `
+      <div style="background:#faf7f2;border:1px solid #ddd0c4;border-radius:8px;padding:.7rem 1rem;margin-bottom:.5rem">
+        <div style="display:flex;justify-content:space-between;align-items:start;gap:8px">
+          <div style="flex:1">
+            ${a.title ? `<div style="font-size:.8rem;font-weight:700;color:#5c3d2e;margin-bottom:3px">${esc(a.title)}</div>` : ''}
+            <div style="font-size:.82rem;color:#2d1f17">${esc(a.text)}</div>
+          </div>
+          <div style="display:flex;gap:5px;flex-shrink:0">
+            <button onclick="editAnnouncement('${a.id}')" style="background:none;border:1px solid #b8a898;border-radius:5px;padding:3px 9px;font-size:.74rem;color:#5c3d2e;cursor:pointer">Edit</button>
+            <button onclick="deleteAnnouncement('${a.id}')" style="background:none;border:1px solid #dba8a8;border-radius:5px;padding:3px 9px;font-size:.74rem;color:#8b3a3a;cursor:pointer">✕</button>
+          </div>
+        </div>
+        <div id="ann-edit-${a.id}" style="display:none;margin-top:.75rem">
+          <input type="text" id="ann-t-${a.id}" value="${esc(a.title||'')}" placeholder="Title (optional)" style="width:100%;padding:6px 10px;border:1px solid #ddd0c4;border-radius:6px;font-family:inherit;font-size:.83rem;background:#fff;margin-bottom:5px"/>
+          <textarea id="ann-b-${a.id}" style="width:100%;padding:6px 10px;border:1px solid #ddd0c4;border-radius:6px;font-family:inherit;font-size:.83rem;background:#fff;resize:vertical;min-height:60px">${esc(a.text)}</textarea>
+          <div style="display:flex;gap:6px;margin-top:5px">
+            <button onclick="saveAnnouncement('${a.id}')" style="background:#5c3d2e;color:#fff;border:none;border-radius:6px;padding:5px 14px;font-family:inherit;font-size:.82rem;cursor:pointer">Save</button>
+            <button onclick="cancelEditAnn('${a.id}')" style="background:none;border:1px solid #ddd0c4;border-radius:6px;padding:5px 12px;font-family:inherit;font-size:.82rem;cursor:pointer">Cancel</button>
+          </div>
+        </div>
+      </div>`).join('');
+  }
+
+  function editAnnouncement(id) { document.getElementById('ann-edit-'+id).style.display='block'; }
+  function cancelEditAnn(id) { document.getElementById('ann-edit-'+id).style.display='none'; }
+
+  async function saveAnnouncement(id) {
+    const title = document.getElementById('ann-t-'+id).value.trim();
+    const text = document.getElementById('ann-b-'+id).value.trim();
+    if (!text) return;
+    try {
+      await fetch('/api/announcement?id='+id, {
+        method:'PUT', headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},
+        body:JSON.stringify({title:title||null,text})
+      });
+      loadAnnouncementAdmin();
+    } catch(e) { alert('Save failed.'); }
+  }
+
+  async function addAnnouncement() {
+    const title = document.getElementById('annTitle').value.trim();
+    const text = document.getElementById('annText').value.trim();
+    if (!text) { alert('Announcement text is required.'); return; }
+    try {
+      await fetch('/api/announcement', {
+        method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},
+        body:JSON.stringify({title:title||null,text})
+      });
+      document.getElementById('annTitle').value='';
+      document.getElementById('annText').value='';
+      loadAnnouncementAdmin();
+    } catch(e) { alert('Failed to add announcement.'); }
+  }
+
+  async function deleteAnnouncement(id) {
+    if (!confirm('Delete this announcement?')) return;
+    try {
+      await fetch('/api/announcement?id='+id, {method:'DELETE',headers:{'Authorization':`Bearer ${token}`}});
+      loadAnnouncementAdmin();
+    } catch(e) { alert('Delete failed.'); }
+  }
+
+  // ── FEATURE CARDS ──
+  async function loadFeatureCardsAdmin() {
+    try {
+      const res = await fetch('/api/feature-cards', { headers: { 'Authorization': `Bearer ${token}` } });
+      const data = await res.json();
+      renderFeatureCardsAdmin(data.cards || []);
+    } catch(e) {}
+  }
+
+  function renderFeatureCardsAdmin(cards) {
+    const el = document.getElementById('adminCardsList');
+    if (!el) return;
+    if (!cards.length) { el.innerHTML='<p style="font-size:.82rem;color:#9a8a7a;font-style:italic">No feature cards yet.</p>'; return; }
+    el.innerHTML = cards.map(c => `
+      <div style="background:#faf7f2;border:1px solid #ddd0c4;border-radius:8px;padding:.7rem 1rem;margin-bottom:.5rem;display:flex;gap:.75rem;align-items:center">
+        ${c.photo_url ? `<img src="${c.photo_url}" style="width:44px;height:44px;border-radius:50%;object-fit:cover;flex-shrink:0"/>` : '<div style="width:44px;height:44px;border-radius:50%;background:#e8ddd0;flex-shrink:0"></div>'}
+        <div style="flex:1;min-width:0">
+          <div style="font-size:.88rem;font-weight:600;color:#2d1f17">${esc(c.title)}</div>
+          <div style="font-size:.74rem;color:#7a5c50;margin-top:1px">${esc((c.body||'').slice(0,60))}${(c.body||'').length>60?'...':''}</div>
+          <div style="font-size:.68rem;color:#9a8a7a;margin-top:2px">Order: ${c.sort_order} · ${c.active?'Active':'Hidden'}</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-shrink:0">
+          <button onclick="editFeatureCard('${c.id}')" style="background:none;border:1px solid #b8a898;border-radius:5px;padding:3px 9px;font-size:.74rem;color:#5c3d2e;cursor:pointer">Edit</button>
+          <button onclick="deleteFeatureCard('${c.id}')" style="background:none;border:1px solid #dba8a8;border-radius:5px;padding:3px 9px;font-size:.74rem;color:#8b3a3a;cursor:pointer">✕</button>
+        </div>
+      </div>
+      <div id="fc-edit-${c.id}" style="display:none;background:#f0ebe3;border:1px solid #ddd0c4;border-radius:8px;padding:.8rem 1rem;margin-bottom:.5rem">
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <input type="text" id="fc-t-${c.id}" value="${esc(c.title)}" style="padding:6px 10px;border:1px solid #ddd0c4;border-radius:6px;font-family:inherit;font-size:.83rem;background:#fff"/>
+          <textarea id="fc-b-${c.id}" style="padding:6px 10px;border:1px solid #ddd0c4;border-radius:6px;font-family:inherit;font-size:.83rem;background:#fff;resize:vertical;min-height:60px">${esc(c.body||'')}</textarea>
+          <input type="number" id="fc-o-${c.id}" value="${c.sort_order}" style="width:80px;padding:6px 10px;border:1px solid #ddd0c4;border-radius:6px;font-family:inherit;font-size:.83rem;background:#fff"/>
+          <div style="display:flex;gap:8px">
+            <button onclick="saveFeatureCard('${c.id}')" style="background:#5c3d2e;color:#fff;border:none;border-radius:6px;padding:6px 14px;font-family:inherit;font-size:.82rem;cursor:pointer">Save</button>
+            <button onclick="cancelEditFC('${c.id}')" style="background:none;border:1px solid #ddd0c4;border-radius:6px;padding:6px 12px;font-family:inherit;font-size:.82rem;cursor:pointer">Cancel</button>
+          </div>
+        </div>
+      </div>`).join('');
+  }
+
+  function editFeatureCard(id) { document.getElementById('fc-edit-'+id).style.display='block'; }
+  function cancelEditFC(id) { document.getElementById('fc-edit-'+id).style.display='none'; }
+
+  async function saveFeatureCard(id) {
+    const title = document.getElementById('fc-t-'+id).value.trim();
+    const body = document.getElementById('fc-b-'+id).value.trim();
+    const sort_order = parseInt(document.getElementById('fc-o-'+id).value)||0;
+    try {
+      await fetch('/api/feature-cards?id='+id, {
+        method:'PUT', headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},
+        body:JSON.stringify({title,body,sort_order})
+      });
+      loadFeatureCardsAdmin();
+    } catch(e) { alert('Save failed.'); }
+  }
+
+  let pendingPhotoBase64 = null;
+
+  function clearPhoto() {
+    pendingPhotoBase64 = null;
+    document.getElementById('fcPhoto').value='';
+    document.getElementById('fcPhotoPreview').style.display='none';
+  }
+
+  async function uploadPhoto() {
+    const file = document.getElementById('fcPhoto').files[0];
+    if (!file) return null;
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      const res = await fetch('/api/upload', { method:'POST', headers:{'Authorization':`Bearer ${token}`}, body:formData });
+      const data = await res.json();
+      return data.url || null;
+    } catch(e) { return null; }
+  }
+
+  async function addFeatureCard() {
+    const title = document.getElementById('fcTitle').value.trim();
+    const body = document.getElementById('fcBody').value.trim();
+    const font = document.getElementById('fcFont').value;
+    const sort_order = parseInt(document.getElementById('fcOrder').value)||0;
+    const msg = document.getElementById('fcMsg');
+    if (!title) { msg.textContent='Title required'; msg.style.color='#8b3a3a'; msg.style.display='block'; return; }
+    let photo_url = null;
+    const photoFile = document.getElementById('fcPhoto').files[0];
+    if (photoFile) { photo_url = await uploadPhoto(); }
+    try {
+      const res = await fetch('/api/feature-cards', {
+        method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},
+        body:JSON.stringify({title,body,font,photo_url,sort_order,active:true})
+      });
+      if (!res.ok) throw new Error('Failed');
+      ['fcTitle','fcBody'].forEach(id=>document.getElementById(id).value='');
+      document.getElementById('fcOrder').value='0';
+      clearPhoto();
+      msg.textContent='Card added!'; msg.style.color='#14532d'; msg.style.display='block';
+      setTimeout(()=>msg.style.display='none',2000);
+      loadFeatureCardsAdmin();
+    } catch(e) { msg.textContent='Failed'; msg.style.color='#8b3a3a'; msg.style.display='block'; }
+  }
+
+  async function deleteFeatureCard(id) {
+    if (!confirm('Delete this card?')) return;
+    try {
+      await fetch('/api/feature-cards?id='+id, {method:'DELETE',headers:{'Authorization':`Bearer ${token}`}});
+      loadFeatureCardsAdmin();
+    } catch(e) { alert('Delete failed.'); }
+  }
+
+  // ── EXPIRY ──
+  async function loadExpiryData() {
+    try {
+      const res = await fetch('/api/members?admin=1', { headers: { 'Authorization': `Bearer ${token}` } });
+      const members = await res.json();
+      const now = Date.now();
+      const expiryRes = await fetch('/api/settings');
+      const settings = await expiryRes.json();
+      const expiryDays = parseInt(settings.expiry_days) || 180;
+      const warnDays = expiryDays - 30;
+      const expiringSoon = members.filter(m => {
+        const renewed = new Date(m.last_renewed);
+        const age = (now - renewed) / 86400000;
+        return age >= warnDays && age < expiryDays && m.active;
+      });
+      const expired = members.filter(m => !m.active);
+      const active = members.filter(m => m.active);
+      document.getElementById('expiryStats').textContent =
+        `${expiringSoon.length} expiring soon · ${expired.length} expired · ${active.length} active`;
+      const warnEl = document.getElementById('expiryWarnList');
+      if (warnEl && expiringSoon.length) {
+        warnEl.innerHTML = '<div style="font-size:.75rem;font-weight:600;color:#92400e;margin-bottom:.4rem">Expiring soon:</div>' +
+          expiringSoon.map(m => `<div style="display:flex;justify-content:space-between;align-items:center;background:#fef9c3;border:1px solid #fde68a;border-radius:6px;padding:.5rem .75rem;margin-bottom:.4rem;font-size:.8rem">
+            <span>${esc(m.name)}</span>
+            <button onclick="adminRenew('${m.id}')" style="background:#5c3d2e;color:#fff;border:none;border-radius:4px;padding:3px 10px;font-size:.75rem;cursor:pointer">Renew</button>
+          </div>`).join('');
+      }
+    } catch(e) { document.getElementById('expiryStats').textContent = 'Could not load expiry data.'; }
+  }
+
+  async function adminRenew(id) {
+    try {
+      const res = await fetch('/api/member?id=' + id, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ last_renewed: new Date().toISOString(), expiry_warned: false, active: true })
+      });
+      if (!res.ok) throw new Error('Failed');
+      loadExpiryData();
+      await reloadMembers();
+    } catch(e) { alert('Renewal failed.'); }
+  }
+
+  async function runExpiryCheck() {
+    if (!confirm('Run the expiry check now? This will send warning emails to members expiring in 30 days and remove members past their expiry date.')) return;
+    try {
+      const res = await fetch('/api/cron-expiry', { headers: { 'Authorization': `Bearer ${token}` } });
+      if (res.status === 401) { alert('Unauthorized.'); return; }
+      const d = await res.json();
+      alert(`Done!\nWarned: ${d.warned}\nExpired: ${d.expired}\nNo email (admin action needed): ${d.noEmail}`);
+      loadExpiryData();
+      await reloadMembers();
+    } catch(e) { alert('Check failed: ' + e.message); }
+  }
+
+  async function loadExpirySetting() {
+    try {
+      const res = await fetch('/api/settings');
+      const data = await res.json();
+      const days = parseInt(data.expiry_days) || 180;
+      document.getElementById('expiryDaysInput').value = days;
+      document.getElementById('expirySettingNote').textContent =
+        `Warning emails sent at ${days-30} days · Removed at ${days} days`;
+    } catch(e) {}
+  }
+
+  async function saveExpirySetting() {
+    const days = parseInt(document.getElementById('expiryDaysInput').value);
+    const msg = document.getElementById('expirySettingMsg');
+    if (!days || days < 30) { msg.textContent='Minimum is 30 days.'; msg.style.color='#8b3a3a'; msg.style.display='block'; return; }
+    try {
+      const res = await fetch('/api/settings', {
+        method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},
+        body:JSON.stringify({key:'expiry_days',value:days})
+      });
+      if (!res.ok) throw new Error('Failed');
+      msg.textContent='✅ Saved!'; msg.style.color='#14532d'; msg.style.display='block';
+      setTimeout(()=>msg.style.display='none',2000);
+      document.getElementById('expirySettingNote').textContent =
+        `Warning emails sent at ${days-30} days · Removed at ${days} days`;
+    } catch(e) { msg.textContent='Save failed.'; msg.style.color='#8b3a3a'; msg.style.display='block'; }
+  }
+
+  // ── RESOURCES ──
+  async function loadResourcesAdmin() {
+    try {
+      const res = await fetch('/api/resources', { headers: { 'Authorization': `Bearer ${token}` } });
+      const data = await res.json();
+      renderResourcesAdmin(data.resources || []);
+    } catch(e) {}
+  }
+
+  function renderResourcesAdmin(resources) {
+    const list = document.getElementById('adminResourcesList');
+    if (!list) return;
+    if (!resources.length) { list.innerHTML='<p style="font-size:.82rem;color:#9a8a7a;font-style:italic">No resources yet.</p>'; return; }
+    list.innerHTML = resources.map(r => `
+      <div style="background:#faf7f2;border:1px solid #ddd0c4;border-radius:8px;padding:.7rem 1rem;margin-bottom:.5rem;display:flex;gap:.75rem;align-items:center">
+        <div style="font-size:1.3rem;flex-shrink:0">${r.icon||'🔗'}</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:.88rem;font-weight:600;color:#2d1f17">${esc(r.title)}</div>
+          ${r.description?`<div style="font-size:.74rem;color:#7a5c50;margin-top:1px">${esc(r.description.slice(0,60))}${r.description.length>60?'...':''}</div>`:''}
+          <div style="font-size:.68rem;color:#9a8a7a;margin-top:2px">Order: ${r.sort_order}</div>
+        </div>
+        <div style="display:flex;gap:6px;flex-shrink:0;align-items:center">
+          <button onclick="toggleResource('${r.id}',${!r.active})" style="background:none;border:1px solid ${r.active?'#86efac':'#ddd0c4'};border-radius:5px;padding:3px 9px;font-size:.74rem;color:${r.active?'#14532d':'#9a8a7a'};cursor:pointer">${r.active?'✅ On':'⭕ Off'}</button>
+          <button onclick="editResource('${r.id}')" style="background:none;border:1px solid #b8a898;border-radius:5px;padding:3px 9px;font-size:.74rem;color:#5c3d2e;cursor:pointer">Edit</button>
+          <button onclick="deleteResource('${r.id}')" style="background:none;border:1px solid #dba8a8;border-radius:5px;padding:3px 9px;font-size:.74rem;color:#8b3a3a;cursor:pointer">✕</button>
+        </div>
+      </div>
+      <div id="res-edit-${r.id}" style="display:none;background:#f0ebe3;border:1px solid #ddd0c4;border-radius:8px;padding:.8rem 1rem;margin-bottom:.5rem">
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <input type="text" id="res-t-${r.id}" value="${esc(r.title)}" style="padding:6px 10px;border:1px solid #ddd0c4;border-radius:6px;font-family:inherit;font-size:.83rem;background:#fff"/>
+          <input type="text" id="res-d-${r.id}" value="${esc(r.description||'')}" placeholder="Description" style="padding:6px 10px;border:1px solid #ddd0c4;border-radius:6px;font-family:inherit;font-size:.83rem;background:#fff"/>
+          <input type="text" id="res-u-${r.id}" value="${esc(r.url||'')}" placeholder="URL" style="padding:6px 10px;border:1px solid #ddd0c4;border-radius:6px;font-family:inherit;font-size:.83rem;background:#fff"/>
+          <div style="display:flex;gap:8px">
+            <input type="text" id="res-i-${r.id}" value="${r.icon||''}" style="width:70px;padding:6px 10px;border:1px solid #ddd0c4;border-radius:6px;font-family:inherit;font-size:.83rem;background:#fff"/>
+            <input type="number" id="res-o-${r.id}" value="${r.sort_order}" style="width:70px;padding:6px 10px;border:1px solid #ddd0c4;border-radius:6px;font-family:inherit;font-size:.83rem;background:#fff"/>
+            <button onclick="saveResource('${r.id}')" style="background:#5c3d2e;color:#fff;border:none;border-radius:6px;padding:6px 14px;font-family:inherit;font-size:.82rem;cursor:pointer">Save</button>
+            <button onclick="document.getElementById('res-edit-${r.id}').style.display='none'" style="background:none;border:1px solid #ddd0c4;border-radius:6px;padding:6px 12px;font-family:inherit;font-size:.82rem;cursor:pointer">Cancel</button>
+          </div>
+        </div>
+      </div>`).join('');
+  }
+
+  function editResource(id) { document.getElementById('res-edit-'+id).style.display='block'; }
+
+  async function toggleResource(id, active) {
+    try {
+      await fetch('/api/resources?id='+id, {
+        method:'PUT', headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},
+        body:JSON.stringify({active})
+      });
+      loadResourcesAdmin();
+    } catch(e) { alert('Failed to toggle.'); }
+  }
+
+  async function saveResource(id) {
+    const title = document.getElementById('res-t-'+id).value.trim();
+    const description = document.getElementById('res-d-'+id).value.trim();
+    const url = document.getElementById('res-u-'+id).value.trim();
+    const icon = document.getElementById('res-i-'+id).value.trim();
+    const sort_order = parseInt(document.getElementById('res-o-'+id).value)||0;
+    try {
+      const res = await fetch('/api/resources?id='+id, {
+        method:'PUT', headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},
+        body:JSON.stringify({title,description:description||null,url:url||null,icon:icon||'🔗',sort_order})
+      });
+      if (!res.ok) throw new Error('Failed');
+      document.getElementById('res-edit-'+id).style.display='none';
+      loadResourcesAdmin();
+    } catch(e) { alert('Save failed.'); }
+  }
+
+  async function deleteResource(id) {
+    if (!confirm('Delete this resource?')) return;
+    try {
+      await fetch('/api/resources?id='+id, {method:'DELETE',headers:{'Authorization':`Bearer ${token}`}});
+      loadResourcesAdmin();
+    } catch(e) { alert('Delete failed.'); }
+  }
+
+  async function addResource() {
+    const title = document.getElementById('resTitle').value.trim();
+    const description = document.getElementById('resDesc').value.trim();
+    const url = document.getElementById('resUrl').value.trim();
+    const icon = document.getElementById('resIcon').value.trim();
+    const color = document.getElementById('resColor').value;
+    const sort_order = parseInt(document.getElementById('resOrder').value)||0;
+    const msg = document.getElementById('resMsg');
+    if (!title) { msg.textContent='Title required'; msg.style.color='#8b3a3a'; msg.style.display='block'; return; }
+    try {
+      const res = await fetch('/api/resources', {
+        method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},
+        body:JSON.stringify({title,description:description||null,url:url||null,icon:icon||'🔗',color,sort_order})
+      });
+      if (!res.ok) throw new Error('Failed');
+      ['resTitle','resDesc','resUrl','resIcon'].forEach(id=>document.getElementById(id).value='');
+      document.getElementById('resOrder').value='0';
+      msg.textContent='Added!'; msg.style.color='#14532d'; msg.style.display='block';
+      setTimeout(()=>msg.style.display='none',2000);
+      loadResourcesAdmin();
+    } catch(e) { msg.textContent='Failed'; msg.style.color='#8b3a3a'; msg.style.display='block'; }
+  }
+
+
+
+  // ── BROADCAST EMAIL ──
+  function previewBroadcast() {
+    const list = document.getElementById('broadcastList').value;
+    const subject = document.getElementById('broadcastSubject').value.trim();
+    const body = document.getElementById('broadcastBody').value.trim();
+    if (!subject || !body) {
+      const msg = document.getElementById('broadcastMsg');
+      msg.textContent = 'Subject and message are required.';
+      msg.style.color = '#8b3a3a';
+      msg.style.display = 'block';
+      return;
+    }
+    const recipients = allMembers.filter(m => {
+      if (!m.email) return false;
+      if (list === 'male') return m.gender === 'male';
+      if (list === 'female') return m.gender === 'female';
+      return true;
+    });
+    const listLabel = list === 'male' ? "Men's List" : list === 'female' ? "Women's List" : 'All Members';
+    document.getElementById('previewTo').textContent = `${recipients.length} members (${listLabel} with email)`;
+    document.getElementById('previewSubject').textContent = subject;
+    document.getElementById('previewBody').textContent = body;
+    document.getElementById('broadcastPreviewModal').style.display = 'flex';
+  }
+
+  async function sendBroadcast() {
+    const list = document.getElementById('broadcastList').value;
+    const subject = document.getElementById('broadcastSubject').value.trim();
+    const body = document.getElementById('broadcastBody').value.trim();
+    const msg = document.getElementById('broadcastMsg');
+    if (!subject || !body) {
+      msg.textContent = 'Subject and message are required.';
+      msg.style.color = '#8b3a3a';
+      msg.style.display = 'block';
+      return;
+    }
+    const recipients = allMembers.filter(m => {
+      if (!m.email) return false;
+      if (list === 'male') return m.gender === 'male';
+      if (list === 'female') return m.gender === 'female';
+      return true;
+    });
+    if (!recipients.length) {
+      msg.textContent = 'No members with email addresses found for that list.';
+      msg.style.color = '#8b3a3a';
+      msg.style.display = 'block';
+      return;
+    }
+    if (!confirm(`Send to ${recipients.length} members?`)) return;
+    msg.textContent = `Sending to ${recipients.length} members...`;
+    msg.style.color = '#5c3d2e';
+    msg.style.display = 'block';
+    try {
+      const res = await fetch('/api/broadcast', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ subject, body, list })
+      });
+      const d = await res.json();
+      if (!res.ok) throw new Error(d.error || 'Failed');
+      msg.textContent = `✅ Sent to ${d.sent} members${d.failed ? ` (${d.failed} failed)` : ''}.`;
+      msg.style.color = '#14532d';
+      document.getElementById('broadcastSubject').value = '';
+      document.getElementById('broadcastBody').value = '';
+    } catch(e) {
+      msg.textContent = 'Send failed: ' + e.message;
+      msg.style.color = '#8b3a3a';
+    }
+  }
+
+  // ── SESSION TIMEOUT ──
+  let lastActivity = Date.now();
+  const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes
+
+  function resetActivityTimer() { lastActivity = Date.now(); }
+  document.addEventListener('click', resetActivityTimer);
+  document.addEventListener('keydown', resetActivityTimer);
+
+  setInterval(() => {
+    if (token && Date.now() - lastActivity > SESSION_TIMEOUT) {
+      alert('You have been logged out due to inactivity.');
+      logout();
+    }
+  }, 60000); // check every minute
+
+  // ── CSV EXPORT ──
+  function exportCSV() {
+    const headers = ['Name', 'Phone', 'Email', 'Sobriety Date', 'Willing to Sponsor', 'List', 'Has PIN'];
+    const rows = allMembers.map(m => [
+      m.name || '',
+      m.phone || '',
+      m.email || '',
+      m.sobriety_date || '',
+      sponsorDisplay(m),
+      m.gender === 'male' ? "Men's" : m.gender === 'female' ? "Women's" : 'Nonbinary',
+      m.pin_hash ? 'Yes' : 'No'
+    ]);
+    const csv = [headers, ...rows]
+      .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+      .join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `TUF-members-${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  document.addEventListener('keydown', e => { if (e.key === 'Enter' && document.getElementById('loginScreen').style.display !== 'none') login(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+</script>
+</body>
+</html>
