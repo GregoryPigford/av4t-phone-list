@@ -1,8 +1,6 @@
 {
   "outputDirectory": "public",
-  "rewrites": [
-    { "source": "/((?!api/).*)", "destination": "/$1" }
-  ],
+  "cleanUrls": true,
   "crons": [
     {
       "path": "/api/cron-expiry",
