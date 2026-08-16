@@ -309,12 +309,23 @@
     .ty-btn{height:48px;padding:0 32px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--navy);border:none;border-radius:999px;font-family:"DM Sans",sans-serif;font-size:.92rem;font-weight:600;cursor:pointer}
 
     @media print{
-      #tabBar,#home-screen,.g-tabs,.list-header-row,.print-btn{display:none !important}
-      .list-content{display:block !important}
-      .member-cards{display:flex !important}
-      .table-wrap{display:none !important}
-      body,html{overflow:visible;height:auto}
-      #screens{overflow:visible;padding-bottom:0}
+      /* hide every nav + app chrome */
+      #sidebar,#bottomNav,#bottomTabs,.print-btn,.g-tabs,.list-header-row,
+      #inlineGate,#screens::before{display:none !important}
+      /* show ONLY the phone list, whatever tab was active */
+      .screen{display:none !important}
+      #list-screen{display:block !important}
+      #list-screen .list-content,#list-screen .inner{display:block !important}
+      /* roster as a clean table, not the mobile cards */
+      #list-screen .member-cards{display:none !important}
+      #list-screen .table-wrap{display:block !important}
+      #printHeader{display:block !important}
+      /* layout reset so it isn't clipped to one screen height */
+      #app,#screens{display:block !important;overflow:visible;height:auto;margin:0;padding:0}
+      body,html{overflow:visible !important;height:auto !important;background:#fff !important;margin:0}
+      table{width:100%;border-collapse:collapse}
+      th,td{border:1px solid #bbb;padding:5px 8px;font-size:10.5pt;text-align:left;color:#000}
+      thead th{background:#eee !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
     }
 
     /* ── AA BACKGROUND ── */
@@ -425,6 +436,10 @@
             <button onclick="showSubpage('add-page')" style="height:34px;padding:0 14px;background:linear-gradient(135deg,var(--gold),var(--gold2));color:var(--navy);border:none;border-radius:999px;font-family:Fraunces,serif;font-size:.78rem;font-weight:700;cursor:pointer;white-space:nowrap">＋ Add My Info</button>
             <button class="print-btn" onclick="window.print()">⎙ Print</button>
           </div>
+        </div>
+        <div id="printHeader" style="display:none;margin-bottom:12px">
+          <h1 style="font-family:Georgia,serif;font-size:18pt;color:#000;margin:0 0 3px">A Vision For Today — Phone List</h1>
+          <div style="font-size:10pt;color:#333">Mon–Fri · 9:30–10:30 AM · Free Recovery Community · 2122 S Lafayette St, Denver, CO 80210</div>
         </div>
         <div class="member-cards" id="memberCards"></div>
         <div class="table-wrap"><table><thead><tr><th>Name</th><th>Phone</th><th>Email</th><th>Sobriety Date</th><th>Sponsor?</th></tr></thead><tbody id="listBody"></tbody></table></div>
