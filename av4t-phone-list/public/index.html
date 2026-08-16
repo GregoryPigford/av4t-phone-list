@@ -377,7 +377,6 @@
           <h1 class="hero-title">A Vision For Today</h1>
           <p class="hero-sub">Reach out. Stay connected.<br>Keep the vision clear.</p>
           <p style="font-size:.8rem;color:rgba(255,255,255,.45);margin-top:-.5rem;margin-bottom:1rem;line-height:1.6" id="heroMeetingTime"></p>
-          <p style="font-size:.82rem;color:rgba(255,255,255,.5);margin-top:-.75rem;margin-bottom:1rem" id="heroMeetingTime"></p>
 
         </div>
       </div>
@@ -1049,7 +1048,7 @@ async function loadResources(){
 
 async function loadAnnouncement(){
   const bizDate=firstMon().toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric",year:"numeric"});
-  const biz=`<div class="ha-item"><div class="ha-biz-label">📅 Business Meeting</div><div class="ha-biz-body">Feeling a little off in your program? Sponsor nudging you about service? Want to give back and help shape the meeting?<br>Come to the next business meeting — First Monday of every month at 10:30 AM, in person at Free Recovery Community — right after the regular meeting.</div><div style="display:flex;align-items:baseline;gap:.5rem;flex-wrap:wrap;margin-top:.5rem"><span class="ha-date-label">Next:</span><span class="ha-date">${bizDate}</span></div></div>`;
+  const biz=`<div class="ha-item"><div class="ha-biz-label">📅 Group Conscience Meeting</div><div class="ha-biz-body">Feeling a little off in your program? Sponsor nudging you about service? Want to give back and help shape the meeting?<br>Come to the next group conscience meeting — First Monday of every month at 10:30 AM, in person at Free Recovery Community, right after the regular meeting.</div><div style="display:flex;align-items:baseline;gap:.5rem;flex-wrap:wrap;margin-top:.5rem"><span class="ha-date-label">Next:</span><span class="ha-date">${bizDate}</span></div></div>`;
   let extra="";
   try{
     const r=await fetch("/api/announcement");
@@ -1515,8 +1514,9 @@ function getMeetingLocalTime(){
   const addr = '2122 S Lafayette St, Denver, CO 80210';
   const el = document.getElementById('meetingTimeLocal');
   const heroEl = document.getElementById('heroMeetingTime');
-  if(el) el.innerHTML = display + '<br>' + addr;
-  if(heroEl) heroEl.innerHTML = '📍 ' + display;
+  const html = '📍 ' + display + '<br>' + addr;
+  if(el) el.innerHTML = html;
+  if(heroEl) heroEl.innerHTML = html;
 }
 
 // ── INIT ──
