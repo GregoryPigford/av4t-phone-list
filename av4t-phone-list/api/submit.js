@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
 import { Resend } from 'resend';
+import { getExpiryDays } from './_expiry.js';
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -14,7 +15,7 @@ function hashPin(pin) {
   return crypto.createHash('sha256').update(pin + 'av4t2025salt').digest('hex');
 }
 
-async function sendWelcomeEmail(name, email) {
+async function sendWelcomeEmail(name, email, days) {
   if (!email) return;
   await resend.emails.send({
     from: `AV4T Phone List <${FROM}>`,
@@ -35,6 +36,9 @@ async function sendWelcomeEmail(name, email) {
           </div>
           <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:.9rem;margin-bottom:1.1rem">
             <p style="color:#1e40af;font-size:.83rem;line-height:1.65;margin:0">🔑 <strong>Remember your PIN.</strong> You'll need it to update or remove your listing.</p>
+          </div>
+          <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:.9rem;margin-bottom:1.1rem">
+            <p style="color:#9a3412;font-size:.83rem;line-height:1.65;margin:0">📅 <strong>Your listing stays active for ${days} days.</strong> Before it expires, we'll email you a reminder with a one-click link to renew — so you won't drop off the list unexpectedly.</p>
           </div>
           <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:8px;padding:.9rem;margin-bottom:1.1rem">
             <p style="color:#14532d;font-size:.8rem;line-height:1.65;margin:0">📬 Add <strong>noreply@av4t.com</strong> to your contacts to ensure delivery.</p>
@@ -69,12 +73,13 @@ export default async function handler(req, res) {
     sponsor_other: sponsor_other || null,
     gender,
     list_preference: gender === 'nonbinary' ? (list_preference || 'both') : null,
+    last_renewed: new Date().toISOString(),
     pin_hash: hashPin(pin)
   }]).select();
 
   if (error) return res.status(500).json({ error: error.message });
 
-  try { await sendWelcomeEmail(name, email); } catch(e) { console.error('Welcome email failed:', e.message); }
+  try { const days = await getExpiryDays(); await sendWelcomeEmail(name, email, days); } catch(e) { console.error('Welcome email failed:', e.message); }
 
   return res.status(200).json({ success: true, id: data[0].id });
 }

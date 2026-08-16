@@ -26,13 +26,13 @@ export default async function handler(req, res) {
   const dayExpiry = new Date(now - expiryDays * 24 * 60 * 60 * 1000);
 
   const { data: members, error } = await supabase.from('members')
-    .select('id, name, email, last_renewed, expiry_warned').eq('active', true);
+    .select('id, name, email, last_renewed, expiry_warned, created_at').eq('active', true);
   if (error) return res.status(500).json({ error: error.message });
 
   const warned = [], expired = [], noEmail = [];
 
   for (const m of members) {
-    const renewed = new Date(m.last_renewed);
+    const renewed = new Date(m.last_renewed || m.created_at || Date.now());
     const token = Buffer.from(`${m.id}:${process.env.CRON_SECRET}`).toString('base64url');
     const renewUrl = `${BASE_URL}/api/renew?token=${token}`;
 
