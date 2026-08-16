@@ -12,13 +12,14 @@ export default async function handler(req, res) {
   const validAdmin = auth === `Bearer ${process.env.ADMIN_PASSWORD}`;
   if (!validCron && !validAdmin) return res.status(401).json({ error: 'Unauthorized' });
 
-  // Read expiry setting
-  let expiryDays = 180;
+  // Read expiry setting (defaults to 90 to match the seeded settings value)
+  let expiryDays = 90;
   try {
     const { data: settings } = await supabase.from('settings').select('value').eq('key','expiry_days').single();
-    if (settings?.value) expiryDays = parseInt(settings.value) || 180;
+    if (settings?.value) expiryDays = parseInt(settings.value) || 90;
   } catch(e) {}
   const warnDays = expiryDays - 30;
+  const warnWindow = expiryDays - warnDays; // days of notice given in the warning email
 
   const now = new Date();
   const dayWarn = new Date(now - warnDays * 24 * 60 * 60 * 1000);
@@ -42,10 +43,10 @@ export default async function handler(req, res) {
         try {
           await resend.emails.send({
             from: `AV4T Phone List <${FROM}>`, to: m.email,
-            subject: 'Your TUF listing has expired',
+            subject: 'Your AV4T listing has expired',
             html: `<div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:2rem">
               <h2 style="color:#1a2d4a">Hi ${m.name},</h2>
-              <p style="color:#475569;line-height:1.7">Your TUF phone list listing has been automatically removed after 180 days.</p>
+              <p style="color:#475569;line-height:1.7">Your AV4T phone list listing has been automatically removed after ${expiryDays} days.</p>
               <p style="color:#475569;line-height:1.7;margin-bottom:1.25rem">Click below to renew and stay on the list.</p>
               <a href="${renewUrl}" style="display:inline-block;background:#c96a20;color:white;text-decoration:none;padding:12px 28px;border-radius:999px;font-weight:700;font-size:1rem;margin-bottom:1.5rem">Renew My Listing</a>
               <p style="color:#94a3b8;font-size:.82rem">— A Vision For Today</p>
@@ -61,10 +62,10 @@ export default async function handler(req, res) {
         try {
           await resend.emails.send({
             from: `AV4T Phone List <${FROM}>`, to: m.email,
-            subject: 'Your TUF listing expires in 30 days',
+            subject: `Your AV4T listing expires in ${warnWindow} days`,
             html: `<div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:2rem">
               <h2 style="color:#1a2d4a">Hi ${m.name},</h2>
-              <p style="color:#475569;line-height:1.7">Your TUF listing will expire in <strong>30 days</strong>. Click below to stay on the list.</p>
+              <p style="color:#475569;line-height:1.7">Your AV4T listing will expire in <strong>${warnWindow} days</strong>. Click below to stay on the list.</p>
               <a href="${renewUrl}" style="display:inline-block;background:#c96a20;color:white;text-decoration:none;padding:12px 28px;border-radius:999px;font-weight:700;font-size:1rem;margin-bottom:1.5rem">Renew My Listing</a>
               <p style="color:#94a3b8;font-size:.82rem">If you no longer wish to be on the list, ignore this email.<br>— A Vision For Today</p>
             </div>`

@@ -6,7 +6,7 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SER
 const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM = process.env.FROM_EMAIL || 'noreply@av4t.com';
 const SITE = 'https://av4t.com';
-const ADMIN_EMAIL = 'avisionfortoday@gmail.com';
+const ADMIN_EMAIL = 'av4today@gmail.com';
 
 
 // Simple in-memory brute force protection
@@ -51,10 +51,10 @@ async function sendPinSetEmail(name, email, pin) {
   if (!email) return;
   await resend.emails.send({
     from: `AV4T Phone List <${FROM}>`, to: email,
-    subject: 'Your TUF PIN has been set',
+    subject: 'Your AV4T PIN has been set',
     html: `<div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:2rem">
       <h2 style="color:#1a2d4a">Hi ${name},</h2>
-      <p style="color:#475569;line-height:1.7">An admin has set a temporary PIN for your TUF listing.</p>
+      <p style="color:#475569;line-height:1.7">An admin has set a temporary PIN for your AV4T listing.</p>
       <div style="background:#f2f0eb;border-radius:8px;padding:1.1rem;text-align:center;margin:1rem 0">
         <div style="font-size:.7rem;text-transform:uppercase;letter-spacing:.1em;color:#94a3b8;margin-bottom:.4rem">Your Temporary PIN</div>
         <div style="font-family:Georgia,serif;font-size:2.5rem;font-weight:700;color:#1a2d4a;letter-spacing:.3em">${pin}</div>
@@ -71,10 +71,10 @@ async function sendRemovedByUserEmail(name, email) {
   if (!email) return;
   await resend.emails.send({
     from: `AV4T Phone List <${FROM}>`, to: email,
-    subject: "You've been removed from the TUF phone list",
+    subject: "You've been removed from the AV4T phone list",
     html: `<div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:2rem">
       <h2 style="color:#1a2d4a">Hi ${name},</h2>
-      <p style="color:#475569;line-height:1.7">Your entry has been removed from the TUF phone list as requested.</p>
+      <p style="color:#475569;line-height:1.7">Your entry has been removed from the AV4T phone list as requested.</p>
       <p style="color:#475569;line-height:1.7">If this was a mistake or you'd like to rejoin, visit <a href="${SITE}" style="color:#c96a20">av4t.com</a>.</p>
       <p style="color:#94a3b8;font-size:.78rem">— A Vision For Today</p>
     </div>`
@@ -113,7 +113,7 @@ export default async function handler(req, res) {
 
     if (isAdmin) {
       const { name, phone, email, sobriety_date, sponsor_dropdown, sponsor_other,
-              newPin, last_renewed, expiry_warned, active } = body;
+              list_preference, newPin, last_renewed, expiry_warned, active } = body;
       const updates = {};
       if (name !== undefined) updates.name = name;
       if (phone !== undefined) updates.phone = phone;
@@ -121,6 +121,7 @@ export default async function handler(req, res) {
       if (sobriety_date !== undefined) updates.sobriety_date = sobriety_date || null;
       if (sponsor_dropdown !== undefined) updates.sponsor_dropdown = sponsor_dropdown || null;
       if (sponsor_other !== undefined) updates.sponsor_other = sponsor_other || null;
+      if (list_preference !== undefined) updates.list_preference = list_preference || null;
       if (last_renewed !== undefined) updates.last_renewed = last_renewed;
       if (expiry_warned !== undefined) updates.expiry_warned = expiry_warned;
       if (active !== undefined) updates.active = active;
@@ -177,7 +178,7 @@ export default async function handler(req, res) {
     clearAttempts(id);
 
     const { name, phone, email, sobriety_date, sponsor_dropdown, sponsor_other,
-            newPin, last_renewed, expiry_warned, active } = body;
+            list_preference, newPin, last_renewed, expiry_warned, active } = body;
     const updates = {};
     if (name !== undefined) updates.name = name;
     if (phone !== undefined) updates.phone = phone;
@@ -185,6 +186,7 @@ export default async function handler(req, res) {
     if (sobriety_date !== undefined) updates.sobriety_date = sobriety_date || null;
     if (sponsor_dropdown !== undefined) updates.sponsor_dropdown = sponsor_dropdown || null;
     if (sponsor_other !== undefined) updates.sponsor_other = sponsor_other || null;
+    if (list_preference !== undefined) updates.list_preference = list_preference || null;
     if (last_renewed !== undefined) updates.last_renewed = last_renewed;
     if (expiry_warned !== undefined) updates.expiry_warned = expiry_warned;
     if (active !== undefined) updates.active = active;

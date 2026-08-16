@@ -28,11 +28,10 @@ async function sendWelcomeEmail(name, email) {
         </div>
         <div style="background:#fffdf8;padding:1.75rem 2rem;border:1px solid #ddd5c8;border-top:none;border-radius:0 0 12px 12px">
           <h2 style="font-family:Georgia,serif;color:#1a2d4a;font-size:1.2rem;margin:0 0 .75rem">Welcome, ${name}!</h2>
-          <p style="color:#475569;line-height:1.75;margin:0 0 1.25rem">You've been added to the TUF phone list. We're really glad you're here.</p>
+          <p style="color:#475569;line-height:1.75;margin:0 0 1.25rem">You've been added to the AV4T phone list. We're really glad you're here.</p>
           <div style="background:#f2f0eb;border-radius:8px;padding:1.1rem;margin-bottom:1.1rem">
-            <p style="color:#1a2d4a;font-weight:700;font-size:.95rem;margin:0 0 .2rem">📹 Every night at 10pm Pacific</p>
-            <p style="color:#475569;font-size:.85rem;margin:0 0 .75rem">Meeting ID: 806 258 4353</p>
-            <a href="https://us02web.zoom.us/j/8062584353" style="display:inline-block;background:#c96a20;color:white;text-decoration:none;padding:9px 20px;border-radius:999px;font-weight:700;font-size:.88rem">Join on Zoom</a>
+            <p style="color:#1a2d4a;font-weight:700;font-size:.95rem;margin:0 0 .2rem">📍 In person · Mon–Fri, 9:30–10:30 AM</p>
+            <p style="color:#475569;font-size:.85rem;margin:0">Free Recovery Community<br>2122 S Lafayette St, Denver, CO 80210</p>
           </div>
           <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:.9rem;margin-bottom:1.1rem">
             <p style="color:#1e40af;font-size:.83rem;line-height:1.65;margin:0">🔑 <strong>Remember your PIN.</strong> You'll need it to update or remove your listing.</p>
@@ -42,7 +41,7 @@ async function sendWelcomeEmail(name, email) {
           </div>
           <p style="color:#475569;font-size:.88rem;margin:0">Visit: <a href="${SITE}" style="color:#c96a20;font-weight:700">av4t.com</a></p>
           <hr style="border:none;border-top:1px solid #ddd5c8;margin:1.5rem 0"/>
-          <p style="color:#94a3b8;font-size:.78rem;margin:0">— A Vision For Today · <a href="mailto:avisionfortoday@gmail.com" style="color:#c96a20">avisionfortoday@gmail.com</a></p>
+          <p style="color:#94a3b8;font-size:.78rem;margin:0">— A Vision For Today · <a href="mailto:av4today@gmail.com" style="color:#c96a20">av4today@gmail.com</a></p>
         </div>
       </div>`
   });
@@ -55,7 +54,7 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') return res.status(200).end();
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  const { name, phone, email, sobriety_date, sponsor_dropdown, sponsor_other, gender, pin } = req.body;
+  const { name, phone, email, sobriety_date, sponsor_dropdown, sponsor_other, gender, list_preference, pin } = req.body;
 
   if (!name || !phone || !gender)
     return res.status(400).json({ error: 'Name, phone, and gender are required.' });
@@ -69,6 +68,7 @@ export default async function handler(req, res) {
     sponsor_dropdown: sponsor_dropdown || null,
     sponsor_other: sponsor_other || null,
     gender,
+    list_preference: gender === 'nonbinary' ? (list_preference || 'both') : null,
     pin_hash: hashPin(pin)
   }]).select();
 

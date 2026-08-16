@@ -52,7 +52,7 @@ export default async function handler(req, res) {
               <hr style="border:none;border-top:1px solid #ddd5c8;margin:1.5rem 0"/>
               <p style="color:#94a3b8;font-size:.78rem;margin:0">
                 — A Vision For Today · <a href="${SITE}" style="color:#c96a20">av4t.com</a><br>
-                <a href="mailto:avisionfortoday@gmail.com" style="color:#c96a20">avisionfortoday@gmail.com</a>
+                <a href="mailto:av4today@gmail.com" style="color:#c96a20">av4today@gmail.com</a>
               </p>
             </div>
           </div>`
