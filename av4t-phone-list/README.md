@@ -1,6 +1,6 @@
 # A Vision For Today (AV4T) — Phone List Site
 
-A complete clone of the TUF phone-list app, rebranded for **A Vision For Today**
+The phone-list site for **A Vision For Today**
 (Mon–Fri 9:30–10:30 AM, in person at Free Recovery Community, 2122 S Lafayette St,
 Denver, CO 80210). Same architecture: single-file HTML PWA + Vercel serverless API +
 Supabase + Resend email.
@@ -27,8 +27,8 @@ Create a new repo (suggested name: `av4t-phone-list`) and upload:
 
 ## Placeholders to update (flagged so they're easy to find)
 - **Domain:** `av4t.com` (used in email links + sender address)
-- **Contact / Zelle email:** `avisionfortoday@gmail.com`
-- **Venmo donation handle:** `@AV4T-DONATIONS` (or remove the donate button)
+- **Contact email:** `av4today@gmail.com`
+- **Venmo donation handle:** `@Vision4Today`
 
 ## Config reference
 - PIN salt: `av4t2025salt`  (must stay identical in `member.js` and `submit.js`)
