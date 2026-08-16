@@ -536,7 +536,7 @@
     <!-- EXPIRY SECTION -->
     <div style="background:#fff9f2;border:1px solid #ddd0c4;border-radius:10px;padding:1.2rem 1.5rem;margin-bottom:1.25rem">
       <div style="font-family:'Playfair Display',serif;font-size:1rem;color:#5c3d2e;font-weight:600;margin-bottom:.3rem">⏰ Listing Expiry</div>
-      <div style="font-size:.75rem;color:#9a8a7a;margin-bottom:1rem">Members expire 180 days after joining or last renewal. Warning emails sent at 150 days.</div>
+      <div id="expiryBlurb" style="font-size:.75rem;color:#9a8a7a;margin-bottom:1rem">Members expire after their set number of days of inactivity. A warning email is sent 30 days before.</div>
 
       <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:1rem">
         <div id="expiryStats" style="flex:1;min-width:200px;background:#f5f0ea;border-radius:8px;padding:.75rem 1rem;font-size:.82rem;color:#5c3d2e">Loading...</div>
@@ -1013,12 +1013,12 @@
     try {
       const res = await fetch('/api/announcement', { headers: { 'Authorization': `Bearer ${token}` } });
       const data = await res.json();
-      renderAdminAnnouncements(data.announcements || []);
+      renderAdminAnnouncements(data.items || []);
     } catch(e) {}
   }
 
   function renderAdminAnnouncements(anns) {
-    const el = document.getElementById('adminAnnList');
+    const el = document.getElementById('adminAnnounceList');
     if (!el) return;
     if (!anns.length) { el.innerHTML = '<p style="font-size:.82rem;color:#9a8a7a;font-style:italic">No announcements.</p>'; return; }
     el.innerHTML = anns.map(a => `
@@ -1061,16 +1061,16 @@
   }
 
   async function addAnnouncement() {
-    const title = document.getElementById('annTitle').value.trim();
-    const text = document.getElementById('annText').value.trim();
+    const title = document.getElementById('announcementTitle').value.trim();
+    const text = document.getElementById('announcementText').value.trim();
     if (!text) { alert('Announcement text is required.'); return; }
     try {
       await fetch('/api/announcement', {
         method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},
         body:JSON.stringify({title:title||null,text})
       });
-      document.getElementById('annTitle').value='';
-      document.getElementById('annText').value='';
+      document.getElementById('announcementTitle').value='';
+      document.getElementById('announcementText').value='';
       loadAnnouncementAdmin();
     } catch(e) { alert('Failed to add announcement.'); }
   }
@@ -1093,7 +1093,7 @@
   }
 
   function renderFeatureCardsAdmin(cards) {
-    const el = document.getElementById('adminCardsList');
+    const el = document.getElementById('adminFeatureCardsList');
     if (!el) return;
     if (!cards.length) { el.innerHTML='<p style="font-size:.82rem;color:#9a8a7a;font-style:italic">No feature cards yet.</p>'; return; }
     el.innerHTML = cards.map(c => `
@@ -1149,13 +1149,23 @@
   async function uploadPhoto() {
     const file = document.getElementById('fcPhoto').files[0];
     if (!file) return null;
-    const formData = new FormData();
-    formData.append('file', file);
+    if (file.size > 5 * 1024 * 1024) { alert('Image is larger than 5MB. Please choose a smaller file.'); return null; }
     try {
-      const res = await fetch('/api/upload', { method:'POST', headers:{'Authorization':`Bearer ${token}`}, body:formData });
-      const data = await res.json();
-      return data.url || null;
-    } catch(e) { return null; }
+      const data = await new Promise((resolve, reject) => {
+        const r = new FileReader();
+        r.onload = () => resolve(String(r.result).split(',')[1]); // strip data:...;base64, prefix
+        r.onerror = reject;
+        r.readAsDataURL(file);
+      });
+      const res = await fetch('/api/upload', {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json', 'Authorization':`Bearer ${token}` },
+        body: JSON.stringify({ filename: file.name, contentType: file.type, data })
+      });
+      const j = await res.json();
+      if (!res.ok) { alert('Photo upload failed: ' + (j.error || 'unknown error')); return null; }
+      return j.url || null;
+    } catch(e) { alert('Photo upload failed.'); return null; }
   }
 
   async function addFeatureCard() {
@@ -1199,7 +1209,7 @@
       const now = Date.now();
       const expiryRes = await fetch('/api/settings');
       const settings = await expiryRes.json();
-      const expiryDays = parseInt(settings.expiry_days) || 180;
+      const expiryDays = parseInt(settings.expiry_days) || 90;
       const warnDays = expiryDays - 30;
       const expiringSoon = members.filter(m => {
         const renewed = new Date(m.last_renewed);
@@ -1210,6 +1220,9 @@
       const active = members.filter(m => m.active);
       document.getElementById('expiryStats').textContent =
         `${expiringSoon.length} expiring soon · ${expired.length} expired · ${active.length} active`;
+      const blurb = document.getElementById('expiryBlurb');
+      if (blurb) blurb.textContent =
+        `Members expire ${expiryDays} days after joining or last renewal. Warning emails sent at ${warnDays} days.`;
       const warnEl = document.getElementById('expiryWarnList');
       if (warnEl && expiringSoon.length) {
         warnEl.innerHTML = '<div style="font-size:.75rem;font-weight:600;color:#92400e;margin-bottom:.4rem">Expiring soon:</div>' +
