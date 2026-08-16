@@ -342,7 +342,7 @@
 <!-- LOGIN -->
 <div id="loginScreen">
   <div class="login-card">
-    <h1>TUF Admin</h1>
+    <h1>AV4T Admin</h1>
     <p>Phone List Administration</p>
     <input type="password" id="passwordInput" placeholder="Password" onkeydown="if(event.key==='Enter')login()" />
     <button class="btn-primary" onclick="login()">Sign In</button>
@@ -480,7 +480,7 @@
         </div>
         <div>
           <label style="font-size:.7rem;font-weight:600;color:#7a5c50;display:block;margin-bottom:3px;text-transform:uppercase;letter-spacing:.06em">Subject *</label>
-          <input type="text" id="broadcastSubject" placeholder="e.g. TUF Meeting Update" style="width:100%;padding:7px 10px;border:1px solid #ddd0c4;border-radius:6px;font-family:inherit;font-size:.85rem;background:#faf7f2"/>
+          <input type="text" id="broadcastSubject" placeholder="e.g. AV4T Meeting Update" style="width:100%;padding:7px 10px;border:1px solid #ddd0c4;border-radius:6px;font-family:inherit;font-size:.85rem;background:#faf7f2"/>
         </div>
         <div>
           <label style="font-size:.7rem;font-weight:600;color:#7a5c50;display:block;margin-bottom:3px;text-transform:uppercase;letter-spacing:.06em">Message *</label>
@@ -651,10 +651,18 @@
     <div class="field"><label>Sponsor note</label><input type="text" id="editSponsorOther" placeholder="e.g. locally only" /></div>
     <div class="field">
       <label>List</label>
-      <select id="editGender">
+      <select id="editGender" onchange="toggleEditListPref()">
         <option value="male">Men's</option>
         <option value="female">Women's</option>
         <option value="nonbinary">Nonbinary</option>
+      </select>
+    </div>
+    <div class="field" id="editListPrefField" style="display:none">
+      <label>Appears on</label>
+      <select id="editListPref">
+        <option value="both">Both lists</option>
+        <option value="male">Men's list only</option>
+        <option value="female">Women's list only</option>
       </select>
     </div>
     <div class="modal-actions">
@@ -809,7 +817,7 @@
         <td>${m.email ? esc(m.email) : '—'}</td>
         <td>${m.sobriety_date ? formatDate(m.sobriety_date) : '—'}</td>
         <td>${esc(sponsorDisplay(m))}</td>
-        <td>${genderLabel[m.gender] || m.gender}</td>
+        <td>${genderLabel[m.gender] || m.gender}${m.gender==='nonbinary' && m.list_preference && m.list_preference!=='both' ? ` <span style="color:#9a8a7a;font-size:.72rem">(${m.list_preference==='male'?"M":"W"} only)</span>` : ''}</td>
         <td style="white-space:nowrap;font-size:.8rem">${fmtExpiry(m.last_renewed)}</td>
         <td style="text-align:center">${m.pin_hash ? '<span style="color:#14532d;font-weight:600">✅</span>' : '<span style="color:#92400e;font-weight:600">⚠️</span>'}</td>
         <td>
@@ -839,7 +847,14 @@
     document.getElementById('editSponsorDrop').value = m.sponsor_dropdown || '';
     document.getElementById('editSponsorOther').value = m.sponsor_other || '';
     document.getElementById('editGender').value = m.gender || 'male';
+    document.getElementById('editListPref').value = m.list_preference || 'both';
+    toggleEditListPref();
     document.getElementById('editModal').style.display = 'flex';
+  }
+
+  function toggleEditListPref() {
+    const g = document.getElementById('editGender').value;
+    document.getElementById('editListPrefField').style.display = g === 'nonbinary' ? 'block' : 'none';
   }
 
   function closeModal() {
@@ -856,6 +871,8 @@
       sponsor_dropdown: document.getElementById('editSponsorDrop').value || null,
       sponsor_other: document.getElementById('editSponsorOther').value.trim() || null,
       gender: document.getElementById('editGender').value,
+      list_preference: document.getElementById('editGender').value === 'nonbinary'
+        ? document.getElementById('editListPref').value : null,
     };
     try {
       const res = await fetch('/api/member?id=' + id, {
@@ -1367,8 +1384,8 @@
     }
     const recipients = allMembers.filter(m => {
       if (!m.email) return false;
-      if (list === 'male') return m.gender === 'male';
-      if (list === 'female') return m.gender === 'female';
+      if (list === 'male') return m.gender === 'male' || (m.gender === 'nonbinary' && (!m.list_preference || m.list_preference === 'both' || m.list_preference === 'male'));
+      if (list === 'female') return m.gender === 'female' || (m.gender === 'nonbinary' && (!m.list_preference || m.list_preference === 'both' || m.list_preference === 'female'));
       return true;
     });
     const listLabel = list === 'male' ? "Men's List" : list === 'female' ? "Women's List" : 'All Members';
@@ -1391,8 +1408,8 @@
     }
     const recipients = allMembers.filter(m => {
       if (!m.email) return false;
-      if (list === 'male') return m.gender === 'male';
-      if (list === 'female') return m.gender === 'female';
+      if (list === 'male') return m.gender === 'male' || (m.gender === 'nonbinary' && (!m.list_preference || m.list_preference === 'both' || m.list_preference === 'male'));
+      if (list === 'female') return m.gender === 'female' || (m.gender === 'nonbinary' && (!m.list_preference || m.list_preference === 'both' || m.list_preference === 'female'));
       return true;
     });
     if (!recipients.length) {
@@ -1457,7 +1474,7 @@
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `TUF-members-${new Date().toISOString().slice(0,10)}.csv`;
+    a.download = `AV4T-members-${new Date().toISOString().slice(0,10)}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   }

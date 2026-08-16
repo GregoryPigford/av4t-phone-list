@@ -8,7 +8,7 @@
   <meta name="theme-color" content="#1a2d4a"/>
   <meta name="apple-mobile-web-app-capable" content="yes"/>
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
-  <meta name="apple-mobile-web-app-title" content="TUF"/>
+  <meta name="apple-mobile-web-app-title" content="AV4T"/>
   <link rel="apple-touch-icon" href="/icon-192.png"/>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@300;700;900&family=DM+Sans:wght@300;400;500;600&family=Dancing+Script:wght@600&display=swap" rel="stylesheet"/>
   <style>
@@ -525,13 +525,21 @@
         <div class="privacy-note">🔒 Your information is only shared to help members connect for support and fellowship. First name + last initial is common.<br><br>🔑 You'll create a 4-digit PIN to protect your entry. This prevents anyone else from changing or removing your information — your PIN is never stored in plain text.<br><br>📅 Listings stay active for <strong>180 days</strong>. You'll receive an email reminder 30 days before expiry with a one-click renewal link.</div>
         <div class="field">
           <label>Identity <span class="req">*</span></label>
-          <div class="gender-group">
+          <div class="gender-group" id="identityGroup">
             <label class="gender-opt" id="opt-male"><input type="radio" name="gender" value="male"/><span class="gender-label">Male</span></label>
             <label class="gender-opt" id="opt-female"><input type="radio" name="gender" value="female"/><span class="gender-label">Female</span></label>
             <label class="gender-opt" id="opt-nonbinary">
               <input type="radio" name="gender" value="nonbinary"/>
-              <div><div class="gender-label">Nonbinary / Other / Prefer not to say</div><div class="gender-note-form">You'll appear on both lists</div></div>
+              <div><div class="gender-label">Nonbinary / Other / Prefer not to say</div><div class="gender-note-form">Choose which list(s) you'd like to appear on</div></div>
             </label>
+          </div>
+        </div>
+        <div class="field" id="listPrefField" style="display:none">
+          <label>Which list(s) would you like to appear on? <span class="req">*</span></label>
+          <div class="gender-group" id="listPrefGroup">
+            <label class="gender-opt"><input type="radio" name="list_preference" value="both"/><span class="gender-label">Both lists</span></label>
+            <label class="gender-opt"><input type="radio" name="list_preference" value="male"/><span class="gender-label">Men's list</span></label>
+            <label class="gender-opt"><input type="radio" name="list_preference" value="female"/><span class="gender-label">Women's list</span></label>
           </div>
         </div>
         <div class="field"><label for="fname">Name <span class="req">*</span></label><input type="text" id="fname" placeholder="e.g. Diana A." autocomplete="off"/></div>
@@ -705,7 +713,7 @@
       <div class="card" id="confirmCard" style="display:none">
         <p class="card-label">Confirm</p>
         <h2 class="card-title" id="confirmTitle">Remove Entry</h2>
-        <p style="font-size:.88rem;color:var(--text-s);margin-bottom:1.1rem;line-height:1.65">Are you sure you want to remove yourself from the TUF phone list? This cannot be undone.</p>
+        <p style="font-size:.88rem;color:var(--text-s);margin-bottom:1.1rem;line-height:1.65">Are you sure you want to remove yourself from the AV4T phone list? This cannot be undone.</p>
         <button class="remove-btn" id="finalRemoveBtn" onclick="confirmRemove()">Yes, Remove Me</button>
         <div class="msg" id="rmsg"></div>
       </div>
@@ -718,22 +726,15 @@
 <div id="donateModal" style="display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);align-items:center;justify-content:center;padding:1.5rem">
   <div style="background:var(--white);border-radius:var(--radius);padding:1.75rem;max-width:360px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.4)">
     <h2 style="font-family:'Fraunces',serif;font-size:1.3rem;font-weight:900;color:var(--navy);margin-bottom:.35rem">7th Tradition</h2>
-    <p style="font-size:.84rem;color:var(--text-s);line-height:1.65;margin-bottom:1.25rem">AA is self-supporting through our own contributions. Every donation helps keep TUF going. Choose your preferred method:</p>
-    <a href="https://account.venmo.com/u/AV4T-DONATIONS" target="_blank" rel="noopener" onclick="hideDonateModal()" style="display:flex;align-items:center;gap:1rem;background:#008CFF;border-radius:var(--radius-s);padding:1rem 1.25rem;text-decoration:none;margin-bottom:.75rem;transition:opacity .2s">
+    <p style="font-size:.84rem;color:var(--text-s);line-height:1.65;margin-bottom:1.25rem">AA is self-supporting through our own contributions. Every donation helps keep AV4T going. You can contribute through Venmo:</p>
+    <a href="https://account.venmo.com/u/Vision4Today" target="_blank" rel="noopener" onclick="hideDonateModal()" style="display:flex;align-items:center;gap:1rem;background:#008CFF;border-radius:var(--radius-s);padding:1rem 1.25rem;text-decoration:none;margin-bottom:1.25rem;transition:opacity .2s">
       <span style="font-size:1.5rem">💙</span>
       <div>
         <div style="font-family:'Fraunces',serif;font-size:.95rem;font-weight:700;color:white">Venmo</div>
-        <div style="font-size:.78rem;color:rgba(255,255,255,.8);margin-top:1px">@AV4T-DONATIONS</div>
+        <div style="font-size:.78rem;color:rgba(255,255,255,.8);margin-top:1px">@Vision4Today</div>
       </div>
       <span style="margin-left:auto;color:rgba(255,255,255,.7);font-size:1.1rem">→</span>
     </a>
-    <div style="display:flex;align-items:center;gap:1rem;background:#6ec279;border-radius:var(--radius-s);padding:1rem 1.25rem;margin-bottom:1.25rem">
-      <span style="font-size:1.5rem">💚</span>
-      <div>
-        <div style="font-family:'Fraunces',serif;font-size:.95rem;font-weight:700;color:#1a3a1a">Zelle</div>
-        <div style="font-size:.78rem;color:#2a4a2a;margin-top:1px;line-height:1.5">Send to <strong>avisionfortoday@gmail.com</strong><br>Use that as the Zelle recipient ID</div>
-      </div>
-    </div>
     <button onclick="hideDonateModal()" style="width:100%;height:42px;background:none;border:1.5px solid var(--border);border-radius:999px;font-family:'DM Sans',sans-serif;font-size:.88rem;color:var(--text-s);cursor:pointer">Close</button>
   </div>
 </div>
@@ -876,7 +877,7 @@ async function loadMembers(){
   }
 }
 
-function displayMembers(){return allMembers.filter(m=>m.gender===currentListTab||m.gender==="nonbinary");}
+function displayMembers(){return allMembers.filter(m=>m.gender===currentListTab||(m.gender==="nonbinary"&&(!m.list_preference||m.list_preference==="both"||m.list_preference===currentListTab)));}
 
 function soberStr(members){
   let days=0;const today=new Date(),seen=new Set();
@@ -969,7 +970,7 @@ function isSponsor(m){const d=(m.sponsor_dropdown||"").toLowerCase().trim();retu
 function renderSponsorList(){
   buildSponsorTab();
   const seen=new Set();
-  const cands=allMembers.filter(m=>(m.gender===currentSponsorTab||m.gender==="nonbinary")&&isSponsor(m)).filter(m=>{if(seen.has(m.name))return false;seen.add(m.name);return true;});
+  const cands=allMembers.filter(m=>(m.gender===currentSponsorTab||(m.gender==="nonbinary"&&(!m.list_preference||m.list_preference==="both"||m.list_preference===currentSponsorTab)))&&isSponsor(m)).filter(m=>{if(seen.has(m.name))return false;seen.add(m.name);return true;});
   const label=currentSponsorTab==="male"?"Men's":"Women's";
   const meta=document.getElementById("sponsorMeta");
   if(meta) meta.textContent=`${cands.length} member${cands.length===1?"":"s"} on the ${label} list open to sponsoring`;
@@ -991,13 +992,13 @@ async function loadSponsorData(){
 }
 
 // ── ANNOUNCEMENTS ──
-function firstWed(){
+function firstMon(){
   const now=new Date();
   const t=new Date(now.getFullYear(),now.getMonth(),1);
-  while(t.getDay()!==3) t.setDate(t.getDate()+1);
+  while(t.getDay()!==1) t.setDate(t.getDate()+1);
   if(t>now) return t;
   const nm=new Date(now.getFullYear(),now.getMonth()+1,1);
-  while(nm.getDay()!==3) nm.setDate(nm.getDate()+1);
+  while(nm.getDay()!==1) nm.setDate(nm.getDate()+1);
   return nm;
 }
 
@@ -1047,8 +1048,8 @@ async function loadResources(){
 }
 
 async function loadAnnouncement(){
-  const bizDate=firstWed().toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric",year:"numeric"});
-  const biz=`<div class="ha-item"><div class="ha-biz-label">📅 Business Meeting</div><div class="ha-biz-body">Feeling a little off in your program? Sponsor nudging you about service? Want to give back and help shape the meeting?<br>Come to the next business meeting — First Wednesday of every month at 8pm on Zoom.</div><div style="display:flex;align-items:baseline;gap:.5rem;flex-wrap:wrap;margin-top:.5rem"><span class="ha-date-label">Next:</span><span class="ha-date">${bizDate}</span></div></div>`;
+  const bizDate=firstMon().toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric",year:"numeric"});
+  const biz=`<div class="ha-item"><div class="ha-biz-label">📅 Business Meeting</div><div class="ha-biz-body">Feeling a little off in your program? Sponsor nudging you about service? Want to give back and help shape the meeting?<br>Come to the next business meeting — First Monday of every month at 10:30 AM, in person at Free Recovery Community — right after the regular meeting.</div><div style="display:flex;align-items:baseline;gap:.5rem;flex-wrap:wrap;margin-top:.5rem"><span class="ha-date-label">Next:</span><span class="ha-date">${bizDate}</span></div></div>`;
   let extra="";
   try{
     const r=await fetch("/api/announcement");
@@ -1100,7 +1101,15 @@ function esc(s){return String(s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").
 // ── ADD FORM ──
 document.querySelectorAll("input[name='gender']").forEach(r=>{
   r.addEventListener("change",()=>{
-    document.querySelectorAll(".gender-opt").forEach(el=>el.classList.remove("selected"));
+    document.querySelectorAll("#identityGroup .gender-opt").forEach(el=>el.classList.remove("selected"));
+    r.closest(".gender-opt").classList.add("selected");
+    const lp=document.getElementById("listPrefField");
+    if(lp) lp.style.display = r.value==="nonbinary" ? "block" : "none";
+  });
+});
+document.querySelectorAll("input[name='list_preference']").forEach(r=>{
+  r.addEventListener("change",()=>{
+    document.querySelectorAll("#listPrefGroup .gender-opt").forEach(el=>el.classList.remove("selected"));
     r.closest(".gender-opt").classList.add("selected");
   });
 });
@@ -1108,6 +1117,7 @@ document.querySelectorAll("input[name='gender']").forEach(r=>{
 async function handleSubmit(){
   const btn=document.getElementById("submitBtn");
   const gender=document.querySelector("input[name='gender']:checked")?.value;
+  const list_preference=document.querySelector("input[name='list_preference']:checked")?.value;
   const name=document.getElementById("fname").value.trim();
   const phone=document.getElementById("fphone").value.trim();
   const email=document.getElementById("femail").value.trim();
@@ -1117,22 +1127,23 @@ async function handleSubmit(){
   const pin=document.getElementById("fpin").value.trim();
   const pin2=document.getElementById("fpin2").value.trim();
   if(!gender){showMsg("fmsg","Please select your identity.","error");return;}
+  if(gender==="nonbinary"&&!list_preference){showMsg("fmsg","Please choose which list(s) you'd like to appear on.","error");return;}
   if(!name){showMsg("fmsg","Please enter your name.","error");return;}
   if(!phone){showMsg("fmsg","Please enter your phone number.","error");return;}
   if(!pin||!/^\d{4}$/.test(pin)){showMsg("fmsg","Please enter a 4-digit PIN.","error");return;}
   if(pin!==pin2){showMsg("fmsg","PINs don't match. Please try again.","error");return;}
   btn.disabled=true;btn.textContent="Saving...";
   try{
-    const res=await fetch("/api/submit",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name,phone,email,sobriety_date,sponsor_dropdown,sponsor_other,gender,pin})});
+    const res=await fetch("/api/submit",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name,phone,email,sobriety_date,sponsor_dropdown,sponsor_other,gender,list_preference,pin})});
     const data=await res.json();
     if(!res.ok) throw new Error(data.error||"Something went wrong.");
     ["fname","fphone","femail","fsobriety","fsponsor_drop","fsponsor_other","fpin","fpin2"].forEach(id=>document.getElementById(id).value="");
     document.querySelectorAll("input[name='gender']").forEach(el=>el.checked=false);
+    document.querySelectorAll("input[name='list_preference']").forEach(el=>el.checked=false);
+    const lpf=document.getElementById("listPrefField");if(lpf)lpf.style.display="none";
     document.querySelectorAll(".gender-opt").forEach(el=>{el.classList.remove("selected");el.style.pointerEvents="";el.style.opacity="";});
     const note=document.getElementById("genderPrefillNote");if(note)note.remove();
-    document.getElementById("tyMsg").textContent=gender==="nonbinary"
-      ?"You've been added to both lists. We're glad you're here."
-      :"You've been added to the list. We're glad you're here.";
+    document.getElementById("tyMsg").textContent="You've been added to the list. We're glad you're here.";
     document.querySelectorAll(".subpage").forEach(p=>{p.classList.remove("active");p.style.display="none";});
     document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
     const ty=document.getElementById("thankyou-screen");ty.classList.add("active");
@@ -1463,34 +1474,6 @@ function calcSobriety(){
   document.getElementById('sobrietyResult').style.display='block';
 }
 
-function getMeetingLocalTime(){
-  // TUF meets at 10pm Pacific Time daily
-  const now = new Date();
-  // Create a date for 10pm Pacific today
-  const pacificFormatter = new Intl.DateTimeFormat('en-US', {
-    timeZone: 'America/Denver',
-    hour: 'numeric', hour12: true
-  });
-  // Get user's local equivalent of 10pm Pacific
-  try {
-    const ptDate = new Date(now.toLocaleDateString('en-US', {timeZone: 'America/Denver'}) + ' 09:30:00');
-    const localTime = ptDate.toLocaleTimeString('en-US', {hour: 'numeric', minute: '2-digit', hour12: true});
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const localTzAbbr = new Date().toLocaleTimeString('en-US', {timeZoneName:'short'}).split(' ').pop();
-    const el = document.getElementById('meetingTimeLocal');
-    if(el){
-      if(localTzAbbr === 'PDT' || localTzAbbr === 'PST'){
-        el.textContent = 'Mon–Fri · 9:30–10:30 AM · Free Recovery Community, Denver';
-      } else {
-        el.textContent = 'Mon–Fri · 9:30–10:30 AM · Free Recovery Community, Denver';
-      }
-    }
-  } catch(e) {
-    const el = document.getElementById('meetingTimeLocal');
-    if(el) el.textContent = 'Mon–Fri · 9:30–10:30 AM · Free Recovery Community, Denver';
-  }
-}
-
 
 function showDonateModal(){
   const m=document.getElementById("donateModal");
@@ -1527,25 +1510,13 @@ function calcSobriety(){
 }
 
 function getMeetingLocalTime(){
-  try{
-    // AV4T meets 9:30 AM Mountain, Mon–Fri, in person at Free Recovery Community, Denver
-    const now = new Date();
-    const dateStr = now.toLocaleDateString('en-US', {timeZone:'America/Denver'});
-    const ptDate = new Date(dateStr + ', 09:30:00 MST');
-    const localTzAbbr = now.toLocaleTimeString('en-US',{timeZoneName:'short'}).split(' ').pop();
-    const isPacific = localTzAbbr==='PDT'||localTzAbbr==='PST'||localTzAbbr==='PT';
-    const localTime = ptDate.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit',hour12:true,timeZone:Intl.DateTimeFormat().resolvedOptions().timeZone});
-    const el = document.getElementById('meetingTimeLocal');
-    const heroEl = document.getElementById('heroMeetingTime');
-    const display = isPacific
-      ? 'Mon–Fri · 9:30–10:30 AM · Free Recovery Community, Denver'
-      : 'Mon–Fri · 9:30–10:30 AM · Free Recovery Community, Denver';
-    if(el) el.textContent = display;
-    if(heroEl) heroEl.innerHTML = '📍 ' + display;
-  }catch(e){
-    const el=document.getElementById('meetingTimeLocal');
-    if(el) el.textContent='Mon–Fri · 9:30–10:30 AM · Free Recovery Community, Denver';
-  }
+  // AV4T meets in person, Mon–Fri 9:30–10:30 AM, at Free Recovery Community, Denver.
+  const display = 'Mon–Fri · 9:30–10:30 AM · Free Recovery Community';
+  const addr = '2122 S Lafayette St, Denver, CO 80210';
+  const el = document.getElementById('meetingTimeLocal');
+  const heroEl = document.getElementById('heroMeetingTime');
+  if(el) el.innerHTML = display + '<br>' + addr;
+  if(heroEl) heroEl.innerHTML = '📍 ' + display;
 }
 
 // ── INIT ──
@@ -1555,12 +1526,6 @@ loadFeatureCards();
 getMeetingLocalTime();
 loadResources();
 getMeetingLocalTime();
-  // Also set hero meeting time
-  setTimeout(()=>{
-    const heroEl = document.getElementById('heroMeetingTime');
-    const resEl = document.getElementById('meetingTimeLocal');
-    if(heroEl && resEl) heroEl.textContent = '📍 Nightly on Zoom · ' + resEl.textContent;
-  }, 100);
 moveIndicator("home");
 if("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js");
 </script>
