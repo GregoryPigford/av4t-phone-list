@@ -1279,12 +1279,12 @@
         method:'POST', headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},
         body:JSON.stringify({key:'expiry_days',value:days})
       });
-      if (!res.ok) throw new Error('Failed');
+      if (!res.ok) { const j = await res.json().catch(()=>({})); throw new Error(j.error || ('HTTP '+res.status)); }
       msg.textContent='✅ Saved!'; msg.style.color='#14532d'; msg.style.display='block';
       setTimeout(()=>msg.style.display='none',2000);
       document.getElementById('expirySettingNote').textContent =
         `Warning emails sent at ${days-30} days · Removed at ${days} days`;
-    } catch(e) { msg.textContent='Save failed.'; msg.style.color='#8b3a3a'; msg.style.display='block'; }
+    } catch(e) { msg.textContent='Save failed: '+e.message; msg.style.color='#8b3a3a'; msg.style.display='block'; }
   }
 
   // ── RESOURCES ──
