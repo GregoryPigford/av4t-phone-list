@@ -27,7 +27,7 @@ export default async function handler(req, res) {
     const { key, value } = req.body;
     if (!key || value === undefined) return res.status(400).json({ error: 'key and value required' });
     const { error } = await supabase.from('settings')
-      .upsert({ key, value: String(value), updated_at: new Date().toISOString() });
+      .upsert({ key, value: String(value) }, { onConflict: 'key' });
     if (error) return res.status(500).json({ error: error.message });
     return res.status(200).json({ success: true });
   }
